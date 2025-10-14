@@ -111,7 +111,8 @@
     <script>
         // Variáveis globais
         const API_KEY = 'b2461b1c-0e9e-4c0d-b470-a6cd320534f8';
-        const BASE_URL = 'https://www.worldtides.info/api/v3/tides';
+        // A API foi corrigida: Removido "/tides" pois estava causando 404.
+        const BASE_URL = 'https://www.worldtides.info/api/v3/'; 
         
         const MAX_RETRIES = 3;
         const INITIAL_DELAY_MS = 1000;
@@ -194,18 +195,31 @@
          */
         const fetchTidesWithRetry = async (lat, lon) => {
             const { dateStart, dateEnd } = getTideWindowDates();
-            const url = `${BASE_URL}?lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}&extremes=true`;
+            // URL corrigida: Agora usa o endpoint raiz e 'extremes=true' como parâmetro.
+            const url = `${BASE_URL}?extremes=true&lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}`;
             
             errorContainer.classList.add('hidden');
 
             for (let i = 0; i < MAX_RETRIES; i++) {
                 try {
                     const response = await fetch(url);
+                    
+                    // Se a resposta não for 200 OK ou se a API retornar um JSON com erro
+                    if (!response.ok) {
+                        // Tenta ler o corpo como JSON para ver se há erro oficial da API
+                        try {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || `Erro de rede: status ${response.status}`);
+                        } catch (e) {
+                            // Se falhar a leitura do JSON, é porque é HTML (como o 404 original)
+                            throw new Error(`O servidor retornou um erro HTTP ${response.status}. Verifique a API Key e o formato da URL.`);
+                        }
+                    }
+
                     const data = await response.json();
 
-                    if (!response.ok || data.error) {
-                        const errorMsg = data.error || `Erro de rede: status ${response.status}`;
-                        throw new Error(errorMsg);
+                    if (data.error) {
+                        throw new Error(data.error);
                     }
                     
                     return data;
