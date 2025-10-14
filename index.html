@@ -111,7 +111,7 @@
     <script>
         // Variáveis globais
         const API_KEY = 'b2461b1c-0e9e-4c0d-b470-a6cd320534f8';
-        // A API foi corrigida: Removido "/tides" pois estava causando 404.
+        // BASE_URL corrigida para usar o endpoint raiz da v3
         const BASE_URL = 'https://www.worldtides.info/api/v3/'; 
         
         const MAX_RETRIES = 3;
@@ -195,8 +195,8 @@
          */
         const fetchTidesWithRetry = async (lat, lon) => {
             const { dateStart, dateEnd } = getTideWindowDates();
-            // URL corrigida: Agora usa o endpoint raiz e 'extremes=true' como parâmetro.
-            const url = `${BASE_URL}?extremes=true&lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}`;
+            // CORREÇÃO: Usando 'property=extremes' para especificar o que queremos da API, evitando 404.
+            const url = `${BASE_URL}?property=extremes&lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}`;
             
             errorContainer.classList.add('hidden');
 
@@ -204,14 +204,11 @@
                 try {
                     const response = await fetch(url);
                     
-                    // Se a resposta não for 200 OK ou se a API retornar um JSON com erro
                     if (!response.ok) {
-                        // Tenta ler o corpo como JSON para ver se há erro oficial da API
                         try {
                             const errorData = await response.json();
                             throw new Error(errorData.error || `Erro de rede: status ${response.status}`);
                         } catch (e) {
-                            // Se falhar a leitura do JSON, é porque é HTML (como o 404 original)
                             throw new Error(`O servidor retornou um erro HTTP ${response.status}. Verifique a API Key e o formato da URL.`);
                         }
                     }
@@ -219,6 +216,7 @@
                     const data = await response.json();
 
                     if (data.error) {
+                        // Trata erros de API (como "Invalid API Key")
                         throw new Error(data.error);
                     }
                     
@@ -226,11 +224,9 @@
 
                 } catch (error) {
                     if (i === MAX_RETRIES - 1) {
-                        // Última tentativa falhou
                         console.error("Falha ao buscar dados de maré após retentativas:", error.message);
                         throw new Error(`Não foi possível carregar as marés. ${error.message}`);
                     }
-                    // Atraso com backoff exponencial
                     const delay = INITIAL_DELAY_MS * (2 ** i);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
@@ -252,7 +248,7 @@
                 tideResults.innerHTML = `
                     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
                         <p class="font-bold">Sem dados de Maré</p>
-                        <p>Não foram encontrados dados de maré para hoje e amanhã nesta localização. Tente ajustar os valores de Latitude e Longitude.</p>
+                        <p>Não foram encontrados dados de maré para hoje e amanhã nesta localização. Tente ajustar os valores de Latitude e Longitude, ou se certifique de que a localização está próxima ao oceano.</p>
                     </div>
                 `;
                 return;
@@ -260,7 +256,8 @@
 
             // Agrupa as marés por data
             const tidesByDate = extremes.reduce((acc, tide) => {
-                const date = tide.dt.split('T')[0];
+                // A API retorna a data e hora no formato ISO 8601. Pegamos só a data.
+                const date = tide.dt.split('T')[0]; 
                 if (!acc[date]) {
                     acc[date] = [];
                 }
