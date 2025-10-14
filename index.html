@@ -84,6 +84,8 @@
         <header class="text-center py-6 mb-8 bg-white rounded-xl shadow-lg">
             <h1 class="text-4xl font-extrabold text-blue-800 mb-2">🌊 Tábua de Marés</h1>
             <p class="text-xl text-gray-600" id="location-display">Localização: N/A</p>
+            <!-- NOVO: Elemento para exibir a URL de depuração -->
+            <p class="text-sm text-gray-500 mt-2 break-all px-4" id="url-display">URL da API: N/A</p>
         </header>
 
         <div id="loading-indicator" class="text-center text-blue-600 p-8 hidden">
@@ -111,7 +113,7 @@
     <script>
         // Variáveis globais
         const API_KEY = 'b2461b1c-0e9e-4c0d-b470-a6cd320534f8';
-        // CORREÇÃO: Adicionando a barra final para conformidade com a URL do recurso da API v3
+        // BASE URL corrigida para o formato correto v3: 'https://www.worldtides.info/api/v3'
         const BASE_URL = 'https://www.worldtides.info/api/v3'; 
         
         const MAX_RETRIES = 3;
@@ -129,6 +131,7 @@
         const locationDisplay = document.getElementById('location-display');
         const errorContainer = document.getElementById('error-container');
         const errorDetails = document.getElementById('error-details');
+        const urlDisplay = document.getElementById('url-display'); // NOVO: Referência ao elemento de URL
 
         // Novos elementos para o estado automático/manual
         const autoLocationStatus = document.getElementById('auto-location-status');
@@ -195,9 +198,13 @@
          */
         const fetchTidesWithRetry = async (lat, lon) => {
             const { dateStart, dateEnd } = getTideWindowDates();
-            // URL completa com 'tides/' no BASE_URL. Os parâmetros de query '?' vêm depois.
-            const url = `${BASE_URL}?property=extremes&lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}`;
             
+            // CORREÇÃO: Usando 'extremes' como um parâmetro flag, conforme a sintaxe da WorldTides v3.
+            const url = `${BASE_URL}?extremes&lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}`;
+            
+            // NOVO: Exibe a URL construída imediatamente para fins de depuração
+            urlDisplay.textContent = `URL da API: ${url}`;
+
             errorContainer.classList.add('hidden');
 
             for (let i = 0; i < MAX_RETRIES; i++) {
