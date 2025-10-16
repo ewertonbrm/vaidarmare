@@ -1,492 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vai Dar Maré!</title>
-    <!-- Carrega o Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Define a fonte Inter e fallback */
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-        }
-        /* Estilos personalizados para a interface */
-        .tide-card {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 0.75rem; /* Canto arredondado */
-        }
-        .tide-card:hover {
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
-        }
-        /* Estilos Temáticos de Maré */
-        .high-tide {
-            border-left: 5px solid #1d4ed8; /* Azul Escuro */
-            background-color: #e0f2fe; /* Azul muito claro */
-        }
-        .low-tide {
-            border-left: 5px solid #f97316; /* Laranja Vívido */
-            background-color: #fff7ed; /* Amarelo muito claro */
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tábua de Marés - Natal/RN</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #e0f7fa;
+    }
+    h1 { text-align: center; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #ffffff;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #00acc1;
+      color: white;
+    }
+    caption {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
-<!-- Novo fundo com gradiente temático -->
-<body class="bg-gradient-to-br from-blue-50 to-cyan-100 flex flex-col items-center p-4">
+<body>
 
-    <!-- Modal de Entrada de Localização (Estilo aprimorado) -->
-    <div id="location-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition duration-300 scale-100 hover:scale-[1.01]">
-            <h2 class="text-2xl font-extrabold mb-4 text-blue-700">📍 Vai Dar Maré!</h2>
-            
-            <!-- Conteúdo de Carregamento/Tentativa Automática -->
-            <div id="auto-location-status" class="text-center p-4 border border-blue-300 bg-blue-50 rounded-lg">
-                <p id="auto-message" class="text-blue-700 font-semibold">Tentando obter sua localização automaticamente...</p>
-                <!-- Spinner -->
-                <svg id="auto-spinner" class="animate-spin h-6 w-6 mx-auto mt-3 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </div>
+<h1>Tábua de Marés - Natal/RN</h1>
 
-            <!-- Conteúdo Manual (Fallback) - Inicialmente Oculto -->
-            <div id="manual-fallback" class="hidden mt-6">
-                <p class="text-gray-600 mb-6">Por favor, insira a Latitude e Longitude manualmente como alternativa:</p>
-                <div class="space-y-4">
-                    <input type="number" id="lat-input" placeholder="Latitude (Ex: -5.767)" step="0.0001" 
-                           class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150" />
-                    <input type="number" id="lon-input" placeholder="Longitude (Ex: -35.2)" step="0.0001" 
-                           class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150" />
-                </div>
-                
-                <button id="fetch-location-btn" 
-                        class="mt-6 w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-150 ease-in-out shadow-md shadow-blue-300/50">
-                    Buscar Marés Manualmente
-                </button>
-                <p id="error-message" class="text-red-600 mt-4 hidden text-sm font-medium"></p>
-            </div>
-        </div>
-    </div>
+<table id="tideTable">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Maré Alta 1</th>
+      <th>Maré Alta 2</th>
+      <th>Maré Baixa 1</th>
+      <th>Maré Baixa 2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Dados vão aqui -->
+  </tbody>
+</table>
 
-    <!-- Conteúdo Principal do Aplicativo -->
-    <main id="tide-app" class="w-full max-w-4xl opacity-0 transition-opacity duration-500">
-        
-        <!-- Header aprimorado -->
-        <header class="text-center py-8 mb-10 bg-white/95 rounded-3xl shadow-2xl backdrop-blur-sm">
-            <h1 class="text-4xl font-extrabold text-blue-700 mb-2">🌊 Vai Dar Maré!</h1>
-            <p class="text-xl text-gray-600 font-medium" id="location-display">Localização: N/A</p>
-        </header>
+<script>
+const lat = -5.7945; // Natal RN
+const lon = -35.211;
+const apiKey = "77b43510d8844b3ab3eb6e30392f3b2a"; // Coloque sua API Key
 
-        <div id="loading-indicator" class="text-center text-blue-600 p-8 hidden">
-            <svg class="animate-spin h-8 w-8 mx-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="mt-2 text-lg font-medium">Carregando dados de maré...</p>
-        </div>
-        
-        <!-- Layout em grade adaptável para os cartões -->
-        <div id="tide-results" class="grid grid-cols-1 gap-8">
-            <!-- Os resultados de hoje e amanhã serão inseridos aqui -->
-        </div>
+// Converte horário da API (UTC+8) para horário local de Natal (UTC-3)
+function convertToLocalTime(apiTimeStr) {
+  const utcTime = new Date(apiTimeStr + "+08:00"); // API retorna UTC+8
+  // Ajuste para UTC-3 (Natal)
+  const localTime = new Date(utcTime.getTime() - (11 * 60 * 60 * 1000)); // 8 - (-3) = 11h de diferença
+  const hours = localTime.getHours().toString().padStart(2, "0");
+  const minutes = localTime.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
 
-        <div id="error-container" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-8 rounded-lg hidden">
-            <p class="font-bold">Erro na Busca</p>
-            <p id="error-details"></p>
-        </div>
+async function fetchTides() {
+  try {
+    const res = await fetch(`https://devapi.qweather.com/v7/tide?location=${lat},${lon}&key=${apiKey}&unit=m&lang=pt`);
+    const data = await res.json();
 
-        <footer class="text-center text-gray-500 text-sm mt-12 pt-6 border-t border-gray-300/50">
-            Dados fornecidos por WorldTides.info
-        </footer>
-    </main>
+    if (data.code !== "200") {
+      alert("Erro ao buscar dados de maré: " + data.code);
+      return;
+    }
 
-    <script>
-        // Variáveis globais
-        const API_KEY = 'b2461b1c-0e9e-4c0d-b470-a6cd320534f8';
-        const BASE_URL = 'https://www.worldtides.info/api/v3'; 
-        
-        const MAX_RETRIES = 3;
-        const INITIAL_DELAY_MS = 1000;
+    const tbody = document.querySelector("#tideTable tbody");
+    tbody.innerHTML = "";
 
-        // Elementos DOM
-        const locationModal = document.getElementById('location-modal');
-        const fetchLocationBtn = document.getElementById('fetch-location-btn');
-        const latInput = document.getElementById('lat-input');
-        const lonInput = document.getElementById('lon-input');
-        const errorMessage = document.getElementById('error-message');
-        const tideApp = document.getElementById('tide-app');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const tideResults = document.getElementById('tide-results');
-        const locationDisplay = document.getElementById('location-display');
-        const errorContainer = document.getElementById('error-container');
-        const errorDetails = document.getElementById('error-details');
-        
-        // Novos elementos para o estado automático/manual
-        const autoLocationStatus = document.getElementById('auto-location-status');
-        const autoMessage = document.getElementById('auto-message');
-        const autoSpinner = document.getElementById('auto-spinner');
-        const manualFallback = document.getElementById('manual-fallback');
+    // Pegar só hoje e amanhã
+    const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+    const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().slice(0, 10);
 
-        /**
-         * Obtém as datas de início e fim (hoje + 48h) no formato YYYY-MM-DD.
-         */
-        const getTideWindowDates = () => {
-            const today = new Date();
-            
-            // Define a data de início (hoje à meia-noite)
-            const dateStartObj = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            const dateStart = dateStartObj.toISOString().split('T')[0];
+    data.tide.forEach(day => {
+      if(day.date !== today && day.date !== tomorrow) return;
 
-            // Define a data de fim (após 48 horas, o que cobre hoje e amanhã)
-            const dateEndObj = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2);
-            const dateEnd = dateEndObj.toISOString().split('T')[0];
+      const high = day.highTide || [];
+      const low = day.lowTide || [];
+      const row = document.createElement("tr");
 
-            return { dateStart, dateEnd };
-        };
+      row.innerHTML = `
+        <td>${day.date}</td>
+        <td>${high[0] ? convertToLocalTime(high[0].time) + " - " + high[0].height + "m" : "-"}</td>
+        <td>${high[1] ? convertToLocalTime(high[1].time) + " - " + high[1].height + "m" : "-"}</td>
+        <td>${low[0] ? convertToLocalTime(low[0].time) + " - " + low[0].height + "m" : "-"}</td>
+        <td>${low[1] ? convertToLocalTime(low[1].time) + " - " + low[1].height + "m" : "-"}</td>
+      `;
 
-        /**
-         * Formata o Unix timestamp (segundos) para uma string de hora legível.
-         * @param {number} unixTimestamp - Tempo em segundos desde 1970.
-         */
-        const formatTime = (unixTimestamp) => {
-            // Converte segundos para milissegundos
-            const date = new Date(unixTimestamp * 1000); 
-            // Opções para garantir fuso horário correto
-            const options = { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                hour12: false 
-            };
-            return date.toLocaleTimeString('pt-BR', options);
-        };
-        
-        /**
-         * Formata o nome do dia da semana a partir de uma string de data (YYYY-MM-DD).
-         */
-        const formatDay = (dateStr) => {
-            // Cria um objeto Date seguro a partir da string 'YYYY-MM-DD'
-            const date = new Date(dateStr + 'T00:00:00'); 
-            
-            const today = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(today.getDate() + 1);
+      tbody.appendChild(row);
+    });
 
-            // Normaliza todas as datas para meia-noite local (dia completo) para comparação.
-            today.setHours(0, 0, 0, 0);
-            tomorrow.setHours(0, 0, 0, 0);
-            date.setHours(0, 0, 0, 0); 
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao consultar a API de marés.");
+  }
+}
 
-            const isToday = date.getTime() === today.getTime();
-            const isTomorrow = date.getTime() === tomorrow.getTime();
-            
-            if (isToday) return 'Hoje';
-            if (isTomorrow) return 'Amanhã';
+// Atualiza automaticamente ao carregar
+fetchTides();
+</script>
 
-            const options = { weekday: 'long' };
-            return date.toLocaleDateString('pt-BR', options);
-        };
-
-        /**
-         * Implementa a chamada à API WorldTides com backoff exponencial para retentativas.
-         * @param {string} lat - Latitude.
-         * @param {string} lon - Longitude.
-         * @returns {Promise<object>} Dados da API.
-         */
-        const fetchTidesWithRetry = async (lat, lon) => {
-            const { dateStart, dateEnd } = getTideWindowDates();
-            
-            // Inclui 'datum=CD' e 'extremes'
-            const url = `${BASE_URL}?datum=CD&extremes&lat=${lat}&lon=${lon}&key=${API_KEY}&date=${dateStart}&date_end=${dateEnd}`;
-            
-            errorContainer.classList.add('hidden');
-
-            for (let i = 0; i < MAX_RETRIES; i++) {
-                try {
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        try {
-                            const errorData = await response.json();
-                            throw new Error(errorData.error || `Erro de rede: status ${response.status}`);
-                        } catch (e) {
-                            throw new Error(`O servidor retornou um erro HTTP ${response.status}. Verifique a API Key e o formato da URL. Detalhe: ${e.message}`);
-                        }
-                    }
-
-                    const data = await response.json();
-
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-                    
-                    return data;
-
-                } catch (error) {
-                    if (i === MAX_RETRIES - 1) {
-                        console.error("Falha ao buscar dados de maré após retentativas:", error.message);
-                        throw new Error(`Não foi possível carregar as marés. ${error.message}`);
-                    }
-                    const delay = INITIAL_DELAY_MS * (2 ** i);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-        };
-
-        /**
-         * Renderiza os dados de maré na interface.
-         * @param {object} data - Dados da API WorldTides.
-         * @param {string} lat - Latitude utilizada.
-         * @param {string} lon - Longitude utilizada.
-         */
-        const displayTides = (data, lat, lon) => {
-            const extremes = data.extremes || []; 
-            
-            tideResults.innerHTML = '';
-            locationDisplay.textContent = `Localização: Lat ${lat}, Lon ${lon}`;
-            
-            if (extremes.length === 0) {
-                tideResults.innerHTML = `
-                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
-                        <p class="font-bold">Sem dados de Maré</p>
-                        <p>Não foram encontrados dados de maré para hoje e amanhã nesta localização. Tente ajustar os valores de Latitude e Longitude, ou se certifique de que a localização está próxima ao oceano.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Agrupa as marés por data
-            const tidesByDate = extremes.reduce((acc, tide) => {
-                // Verificação de segurança para garantir que dt é um número válido
-                if (typeof tide.dt !== 'number' || isNaN(tide.dt)) {
-                    console.warn('Evento de maré ignorado: timestamp (dt) inválido.', tide);
-                    return acc;
-                }
-                
-                // Converte o Unix timestamp (segundos) para uma string de data (YYYY-MM-DD)
-                const dateObj = new Date(tide.dt * 1000);
-                const date = dateObj.toISOString().split('T')[0];
-                
-                if (!acc[date]) {
-                    acc[date] = [];
-                }
-                acc[date].push(tide);
-                return acc;
-            }, {});
-
-            // Ordena as datas e renderiza
-            Object.keys(tidesByDate).sort().forEach(date => {
-                const dayTides = tidesByDate[date];
-                
-                // Cria um objeto Date seguro para formatação de data local
-                const dateForFormatting = new Date(date + 'T00:00:00');
-                
-                const dateLabel = dateForFormatting.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                const dayName = formatDay(date);
-
-                const dateSection = document.createElement('section');
-                dateSection.className = 'bg-white p-6 rounded-xl shadow-lg mb-8';
-                
-                dateSection.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-700">${dayName}, ${dateLabel}</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="tides-${date}">
-                        <!-- Cartões de maré para o dia -->
-                    </div>
-                `;
-                
-                tideResults.appendChild(dateSection);
-
-                const dayTidesContainer = dateSection.querySelector(`#tides-${date}`);
-
-                dayTides.forEach(tide => {
-                    // Verificação de segurança para garantir que a altura é um número
-                    if (typeof tide.height !== 'number') {
-                        console.warn('Dados de altura de maré inválidos:', tide);
-                        return; // Pula este item se a altura não for um número
-                    }
-                    
-                    const isHigh = tide.type === 'high';
-                    
-                    // Determinação de texto de tipo de maré e ícone
-                    let typeText; 
-                    let icon;
-
-                    if (tide.type === 'high') {
-                        typeText = 'Maré Alta';
-                        icon = '⬆️'; // Seta para cima
-                    } else if (tide.type === 'low') {
-                        typeText = 'Maré Baixa';
-                        icon = '⬇️'; // Seta para baixo
-                    } else {
-                         // Fallback - o que não deveria ocorrer com 'extremes'
-                        typeText = tide.type ? tide.type.charAt(0).toUpperCase() + tide.type.slice(1) : 'Evento';
-                        icon = '〰️'; 
-                    }
-
-                    const typeClass = isHigh ? 'high-tide' : 'low-tide';
-                    
-                    // Usa Math.abs() para garantir que a altura seja sempre POSITIVA (coluna d'água)
-                    const displayHeight = Math.abs(tide.height).toFixed(2);
-
-                    const card = document.createElement('div');
-                    card.className = `tide-card p-4 rounded-lg ${typeClass} flex flex-col justify-between`;
-                    card.innerHTML = `
-                        <p class="text-sm font-semibold text-gray-600 mb-1">${typeText}</p>
-                        <div class="flex items-center justify-between">
-                            <!-- Passa o Unix timestamp (tide.dt) para formatTime -->
-                            <span class="text-3xl font-extrabold text-gray-900">${formatTime(tide.dt)}</span>
-                            <span class="text-3xl">${icon}</span>
-                        </div>
-                        <p class="text-base text-gray-700 mt-2">
-                            Altura: <span class="font-bold">${displayHeight}m</span>
-                        </p>
-                    `;
-                    dayTidesContainer.appendChild(card);
-                });
-            });
-
-            // Mostra o conteúdo principal
-            tideApp.classList.remove('opacity-0');
-        };
-        
-        /**
-         * Função central para buscar e exibir os dados de maré, após obter as coordenadas.
-         */
-        const handleFetchAndDisplay = async (lat, lon) => {
-            // Esconde o modal, mostra o loading principal
-            locationModal.classList.add('hidden');
-            loadingIndicator.classList.remove('hidden');
-            tideApp.classList.add('opacity-0');
-            tideResults.innerHTML = '';
-            errorContainer.classList.add('hidden');
-
-            try {
-                const tideData = await fetchTidesWithRetry(lat, lon);
-                displayTides(tideData, lat, lon);
-            } catch (error) {
-                console.error("Erro final:", error);
-                loadingIndicator.classList.add('hidden');
-                tideApp.classList.remove('opacity-0'); 
-                errorDetails.textContent = error.message;
-                errorContainer.classList.remove('hidden');
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        };
-
-        /**
-         * Tenta obter a localização do navegador (automático).
-         */
-        const tryAutomaticGeolocation = () => {
-            if ("geolocation" in navigator) {
-                // Exibe o modal e o status de tentativa automática
-                locationModal.classList.remove('hidden');
-                autoLocationStatus.classList.remove('hidden');
-                manualFallback.classList.add('hidden');
-                autoMessage.classList.remove('text-red-700');
-                autoMessage.classList.add('text-blue-700');
-                autoMessage.textContent = 'Tentando obter sua localização automaticamente...';
-                autoSpinner.classList.remove('hidden');
-
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        // Sucesso: busca os dados e esconde o modal
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        handleFetchAndDisplay(lat.toFixed(4), lon.toFixed(4));
-                    },
-                    (error) => {
-                        // Erro (Usuário negou ou outro erro de GPS)
-                        console.warn('Erro na Geolocation:', error.code, error.message);
-                        
-                        let msg = 'Não foi possível obter a localização automática.';
-                        if (error.code === 1) {
-                            msg = 'Acesso à localização negado pelo usuário. Por favor, insira manualmente.';
-                        } else if (error.code === 2) {
-                            msg = 'Localização indisponível ou falha na rede. Insira manualmente.';
-                        } else {
-                            msg = 'Ocorreu um erro desconhecido. Insira manualmente.';
-                        }
-                        
-                        // Exibe a mensagem de erro e o fallback manual
-                        autoMessage.textContent = `❌ ${msg}`;
-                        autoMessage.classList.remove('text-blue-700');
-                        autoMessage.classList.add('text-red-700');
-                        autoSpinner.classList.add('hidden');
-                        
-                        // Mostra os campos manuais como fallback
-                        manualFallback.classList.remove('hidden');
-                        
-                        // Garante que o modal permaneça aberto para a entrada manual
-                        locationModal.classList.remove('hidden');
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 5000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
-                // Geolocation não é suportada
-                autoMessage.textContent = '❌ Geolocation não suportada no seu navegador. Use a entrada manual.';
-                autoMessage.classList.remove('text-blue-700');
-                autoMessage.classList.add('text-red-700');
-                autoSpinner.classList.add('hidden');
-                manualFallback.classList.remove('hidden');
-                locationModal.classList.remove('hidden');
-            }
-        };
-
-        /**
-         * Manipulador para a entrada manual (Fallback).
-         */
-        const handleManualFetch = async () => {
-            const lat = latInput.value.trim();
-            const lon = lonInput.value.trim();
-            
-            errorMessage.classList.add('hidden');
-            
-            // Validação simples
-            if (lat === '' || lon === '') {
-                errorMessage.textContent = 'Por favor, preencha a Latitude e a Longitude.';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-
-            const parsedLat = parseFloat(lat);
-            const parsedLon = parseFloat(lon);
-
-            if (isNaN(parsedLat) || isNaN(parsedLon) || parsedLat < -90 || parsedLat > 90 || parsedLon < -180 || parsedLon > 180) {
-                errorMessage.textContent = 'Valores de Latitude/Longitude inválidos.';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-            
-            handleFetchAndDisplay(parsedLat.toFixed(4), parsedLon.toFixed(4));
-        };
-
-        // Adiciona o evento ao botão (manual)
-        fetchLocationBtn.addEventListener('click', handleManualFetch);
-
-        // Opcional: Permite enviar pressionando Enter nos campos
-        latInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleManualFetch(); });
-        lonInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleManualFetch(); });
-
-        // Inicia a tentativa automática de localização ao carregar
-        window.onload = tryAutomaticGeolocation;
-
-    </script>
 </body>
 </html>
