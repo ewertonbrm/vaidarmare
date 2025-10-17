@@ -6,28 +6,37 @@
   <title>Tábua de Marés - Natal/RN</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       margin: 20px;
-      background: #e0f7fa;
+      background: linear-gradient(to bottom right, #b2ebf2, #e0f7fa);
       color: #003b46;
     }
     h1 {
       text-align: center;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
-    p#apiURL {
+    #apiInfo {
+      background: #b2ebf2;
+      color: #004d40;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.85em;
+      word-wrap: break-word;
+      margin-bottom: 15px;
+    }
+    #updated {
       text-align: center;
       font-size: 0.9em;
-      color: #004d40;
-      background: #b2ebf2;
-      padding: 6px;
-      border-radius: 8px;
+      color: #00695c;
+      margin-top: -5px;
+      margin-bottom: 20px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
       background: #ffffff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     th, td {
       border: 1px solid #999;
@@ -38,12 +47,19 @@
       background: #00acc1;
       color: white;
     }
+    tr:nth-child(even) {
+      background: #f1f1f1;
+    }
+    @media (max-width: 600px) {
+      th, td { font-size: 0.85em; padding: 6px; }
+    }
   </style>
 </head>
 <body>
 
 <h1>Tábua de Marés - Natal/RN</h1>
-<p id="apiURL"></p>
+<p id="apiInfo">Consultando dados...</p>
+<p id="updated"></p>
 
 <table id="tideTable">
   <thead>
@@ -56,50 +72,67 @@
     </tr>
   </thead>
   <tbody>
-    <!-- Dados vão aqui -->
+    <tr><td colspan="5">Carregando dados...</td></tr>
   </tbody>
 </table>
 
 <script>
-const lat = -5.7945;  // Natal RN
-const lon = -35.211;
-const apiKey = "77b43510d8844b3ab3eb6e30392f3b2a"; // sua chave
-const apiURL = `https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide?location=P2902&date=20251019&key=${apiKey}`;
+const locationCode = "P2902"; // Natal/RN
+const apiKey = "77b43510d8844b3ab3eb6e30392f3b2a";
+const apiBase = "https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide";
 
-document.getElementById("apiURL").textContent = apiURL;
-
-// Converte horário UTC+8 (API) para UTC-3 (Natal/RN)
+// Converte UTC+8 (API) → UTC−3 (Natal)
 function convertToLocalTime(apiTimeStr) {
-  const utcTime = new Date(apiTimeStr + "+08:00"); 
-  const localTime = new Date(utcTime.getTime() - (11 * 60 * 60 * 1000)); // UTC+8 → UTC-3
+  const utcTime = new Date(apiTimeStr + "+08:00");
+  const localTime = new Date(utcTime.getTime() - (11 * 60 * 60 * 1000)); // diferença 11h
   const hours = localTime.getHours().toString().padStart(2, "0");
   const minutes = localTime.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
 
+// Retorna data YYYYMMDD
+function formatDateYMD(dateObj) {
+  return dateObj.toISOString().slice(0,10).replace(/-/g,"");
+}
+
+// Atualiza linha "Última atualização"
+function updateTimestamp() {
+  const now = new Date();
+  const options = { timeZone: "America/Fortaleza", hour: "2-digit", minute: "2-digit" };
+  document.getElementById("updated").textContent = "Última atualização: " + now.toLocaleString("pt-BR", options);
+}
+
+// Consulta marés (hoje + amanhã)
 async function fetchTides() {
-  try {
-    const res = await fetch(apiURL);
-    const data = await res.json();
+  const today = new Date();
+  const tomorrow = new Date(Date.now() + 24*60*60*1000);
+  const dates = [formatDateYMD(today), formatDateYMD(tomorrow)];
 
-    if (data.code !== "200") {
-      alert("Erro ao buscar dados de maré: " + data.code);
-      return;
-    }
+  const tbody = document.querySelector("#tideTable tbody");
+  tbody.innerHTML = "";
 
-    const tbody = document.querySelector("#tideTable tbody");
-    tbody.innerHTML = "";
+  let apiListHTML = "";
 
-    const today = new Date().toISOString().slice(0, 10);
-    const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().slice(0, 10);
+  for (const d of dates) {
+    const url = `${apiBase}?location=${locationCode}&date=${d}&key=${apiKey}`;
+    apiListHTML += `<div>${url}</div>`;
 
-    data.tide.forEach(day => {
-      if (day.date !== today && day.date !== tomorrow) return;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
 
+      if (data.code !== "200") {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="5">Erro ao buscar dados (${d}): ${data.code}</td>`;
+        tbody.appendChild(tr);
+        continue;
+      }
+
+      const day = data.tideDaily;
       const high = day.highTide || [];
       const low = day.lowTide || [];
-      const row = document.createElement("tr");
 
+      const row = document.createElement("tr");
       row.innerHTML = `
         <td>${day.date}</td>
         <td>${high[0] ? convertToLocalTime(high[0].time) + " - " + high[0].height + "m" : "-"}</td>
@@ -107,14 +140,20 @@ async function fetchTides() {
         <td>${low[0] ? convertToLocalTime(low[0].time) + " - " + low[0].height + "m" : "-"}</td>
         <td>${low[1] ? convertToLocalTime(low[1].time) + " - " + low[1].height + "m" : "-"}</td>
       `;
-
       tbody.appendChild(row);
-    });
 
-  } catch (err) {
-    console.error(err);
-    alert("Erro ao consultar a API de marés.");
+    } catch (err) {
+      console.error(err);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="5">Erro de conexão (${d})</td>`;
+      tbody.appendChild(tr);
+    }
   }
+
+  document.getElementById("apiInfo").innerHTML = 
+    `<strong>APIs consultadas:</strong><br>${apiListHTML}`;
+  
+  updateTimestamp();
 }
 
 fetchTides();
@@ -122,4 +161,3 @@ fetchTides();
 
 </body>
 </html>
-
