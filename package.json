@@ -1,0 +1,9 @@
+{
+  "name": "qweather-tide-app",
+  "version": "1.0.0",
+  "description": "Proxy for QWeather Tide API using Vercel Serverless Function.",
+  "main": "api/tide.js",
+  "scripts": {
+    "start": "node api/tide.js"
+  }
+}
