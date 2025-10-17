@@ -1,132 +1,308 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tábua de Marés - Natal/RN</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #eef6fb;
-      color: #222;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #0077b6;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-    }
-    main {
-      max-width: 600px;
-      margin: 2rem auto;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 1rem 1.5rem;
-    }
-    h2 {
-      border-bottom: 2px solid #0077b6;
-      padding-bottom: 0.3rem;
-    }
-    .tide {
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #eee;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-      text-align: center;
-    }
-    .api-url {
-      font-size: 0.85rem;
-      color: #555;
-      word-wrap: break-word;
-      margin-top: 0.5rem;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tábuas de Marés QWeather</title>
+    <!-- Carrega o Tailwind CSS para estilização responsiva e moderna -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilização personalizada para a tabela e o corpo */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f8ff; /* Azul muito claro, tom costeiro */
+        }
+        .container-card {
+            box-shadow: 0 10px 30px rgba(0, 50, 100, 0.1);
+            transition: all 0.3s ease;
+        }
+        .container-card:hover {
+            box-shadow: 0 15px 40px rgba(0, 50, 100, 0.15);
+        }
+        .header-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); /* Gradiente Azul Profundo */
+        }
+        .tide-high {
+            background-color: #dbeafe; /* Azul claro para maré alta */
+            border-left: 4px solid #3b82f6;
+        }
+        .tide-low {
+            background-color: #f1f5f9; /* Cinza claro para maré baixa */
+            border-left: 4px solid #64748b;
+        }
+        .spinner {
+            border-top-color: #3b82f6;
+            border-left-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>Tábua de Marés - Natal/RN 🌊</h1>
-  </header>
-  <main>
-    <div id="api-url" class="api-url"></div>
-    <div id="content">Carregando dados...</div>
-  </main>
+<body class="p-4 md:p-8 min-h-screen flex items-start justify-center">
 
-  <script>
-    const apiKey = "77b43510d8844b3ab3eb6e30392f3b2a";
-    const locationCode = "P2902"; // Natal/RN
-    const proxy = "https://corsproxy.io/?";
-    const baseURL = `https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide`;
+    <div class="w-full max-w-4xl bg-white rounded-xl container-card overflow-hidden">
 
-    function getDateOffset(days) {
-      const d = new Date();
-      d.setDate(d.getDate() + days);
-      return d.toISOString().split('T')[0].replace(/-/g, '');
-    }
+        <!-- Header -->
+        <header class="header-bg p-6 text-white text-center rounded-t-xl">
+            <h1 class="text-3xl font-bold mb-1">🌊 Tábua de Marés Diária</h1>
+            <p class="text-sm opacity-90">Consulta de dados de marés via QWeather API</p>
+        </header>
 
-    async function fetchTides(date) {
-      const url = `${baseURL}?location=${locationCode}&date=${date}&key=${apiKey}`;
-      document.getElementById("api-url").textContent = url;
-      const response = await fetch(proxy + encodeURIComponent(url));
-      if (!response.ok) throw new Error("Erro ao acessar API");
-      const data = await response.json();
-      return data;
-    }
-
-    function formatTime(utcTime) {
-      const date = new Date(utcTime);
-      return date.toLocaleString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        day: "2-digit",
-        month: "2-digit",
-        timeZoneName: "short"
-      });
-    }
-
-    async function loadTides() {
-      const content = document.getElementById("content");
-      content.textContent = "Carregando dados...";
-      try {
-        const today = getDateOffset(0);
-        const tomorrow = getDateOffset(1);
-        const [todayData, tomorrowData] = await Promise.all([
-          fetchTides(today),
-          fetchTides(tomorrow)
-        ]);
-
-        let html = "";
-        const renderDay = (label, data) => {
-          html += `<h2>${label}</h2>`;
-          if (data && data.tideTable && data.tideTable.tide.length > 0) {
-            data.tideTable.tide.forEach(t => {
-              html += `
-                <div class="tide">
-                  <strong>${t.type}</strong>: ${formatTime(t.time)} — ${t.height} m
+        <!-- Formulário de Entrada -->
+        <section class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <div>
+                    <label for="locationId" class="block text-sm font-medium text-gray-700 mb-1">ID da Localização (QWeather)</label>
+                    <input type="text" id="locationId" value="P2902" placeholder="Ex: P2902"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                           title="Insira o ID da localização fornecido pela QWeather.">
                 </div>
-              `;
-            });
-          } else {
-            html += `<p>Sem dados disponíveis.</p>`;
-          }
-        };
 
-        renderDay("Hoje", todayData);
-        renderDay("Amanhã", tomorrowData);
-        content.innerHTML = html;
+                <div>
+                    <label for="dateInput" class="block text-sm font-medium text-gray-700 mb-1">Data da Consulta</label>
+                    <input type="date" id="dateInput"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                           title="Selecione a data para a qual deseja ver a tábua de marés.">
+                </div>
 
-      } catch (err) {
-        console.error(err);
-        content.innerHTML = `<p class="error">Erro ao carregar dados da API.</p>`;
-      }
-    }
+                <div class="flex items-end">
+                    <button id="fetchButton" 
+                            class="w-full p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-150 ease-in-out transform hover:scale-[1.01] active:scale-[0.99] disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        Consultar Marés
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-2">
+                *O endpoint base e a chave são definidos no JavaScript para esta demonstração. Ajuste-os conforme sua configuração Vercel/QWeather.
+            </p>
+        </section>
 
-    loadTides();
-  </script>
+        <!-- Área de Resultados -->
+        <section class="p-6">
+            <div id="loadingIndicator" class="hidden text-center p-4">
+                <div class="spinner w-8 h-8 border-4 border-gray-200 rounded-full inline-block"></div>
+                <p class="mt-2 text-blue-600 font-medium">Buscando dados de marés...</p>
+            </div>
+
+            <div id="errorMessage" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                <p class="font-bold">Erro na Consulta</p>
+                <p id="errorText"></p>
+            </div>
+
+            <div id="tideResults" class="mt-4">
+                <!-- Tabela de Marés será injetada aqui -->
+            </div>
+            
+            <div id="basicInfo" class="mt-4 text-sm text-gray-600 border-t pt-4">
+                <!-- Informações básicas (status, referências) serão injetadas aqui -->
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Configurações do Firebase (MANDATORY for Canvas environment)
+        // Mesmo que este app não use Firestore, é obrigatório incluir as variáveis de ambiente
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const locationIdInput = document.getElementById('locationId');
+            const dateInput = document.getElementById('dateInput');
+            const fetchButton = document.getElementById('fetchButton');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorMessageDiv = document.getElementById('errorMessage');
+            const errorTextP = document.getElementById('errorText');
+            const tideResultsDiv = document.getElementById('tideResults');
+            const basicInfoDiv = document.getElementById('basicInfo');
+
+            // 1. Configurações da API QWeather
+            // ATENÇÃO: Use um endpoint Vercel REWRITE ou EDGE FUNCTION para ocultar a chave (KEY)
+            // A URL BASE e KEY fornecidas pelo usuário são usadas aqui para DEMONSTRAÇÃO.
+            const API_BASE_URL = 'https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide';
+            const API_KEY = '77b43510d8844b3ab3eb6e30392f3b2a'; // Chave QWeather
+
+            // Preenche a data com o dia atual por padrão
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+            
+            // Adiciona um listener ao botão
+            fetchButton.addEventListener('click', fetchTideData);
+
+            // Função de utilidade para formatar o tempo (HH:MM)
+            const formatTime = (time) => {
+                // A API retorna a hora no formato ISO 8601, ex: "2025-10-19T03:00+08:00"
+                // Queremos apenas o horário local.
+                try {
+                    const dateObj = new Date(time);
+                    // O toLocaleTimeString usa as configurações regionais do navegador
+                    return dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    console.error("Erro ao formatar o tempo:", e);
+                    return time.substring(11, 16); // Fallback simples HH:MM
+                }
+            };
+            
+            // Função para buscar os dados
+            async function fetchTideData() {
+                const locationId = locationIdInput.value.trim();
+                const dateRaw = dateInput.value; // Formato YYYY-MM-DD
+                
+                if (!locationId || !dateRaw) {
+                    displayError('Por favor, preencha o ID da Localização e selecione uma data.');
+                    return;
+                }
+
+                // Formata a data para YYYYMMDD (formato da API)
+                const dateFormatted = dateRaw.replace(/-/g, '');
+
+                // Constrói a URL completa
+                const url = `${API_BASE_URL}?location=${locationId}&date=${dateFormatted}&key=${API_KEY}`;
+
+                // Limpa resultados anteriores e mostra o indicador de carregamento
+                tideResultsDiv.innerHTML = '';
+                basicInfoDiv.innerHTML = '';
+                errorMessageDiv.classList.add('hidden');
+                loadingIndicator.classList.remove('hidden');
+                fetchButton.disabled = true;
+
+                try {
+                    // Implementação de Backoff Exponencial (Simulada para melhor prática)
+                    let response;
+                    for (let attempt = 0; attempt < 3; attempt++) {
+                        response = await fetch(url);
+                        if (response.status !== 429) break; // Sai se não for erro de limite de taxa (Rate Limit)
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000)); // Espera 1s, 2s, 4s...
+                    }
+
+                    if (!response.ok) {
+                        // Tenta ler o erro do corpo da resposta, se disponível
+                        let errorDetail = await response.json().catch(() => ({}));
+                        let errorMsg = `HTTP Erro ${response.status}: ${errorDetail.code || 'Erro desconhecido'}.`;
+                        if (errorDetail.code === '404' && response.status === 200) {
+                            // O QWeather usa o código 404 no corpo da resposta para 'sem dados'
+                            errorMsg = 'Nenhum dado de maré encontrado para esta localização e data.';
+                        }
+                        displayError(errorMsg);
+                        return;
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.code !== '200') {
+                        // Lidar com códigos de erro da QWeather
+                        displayError(`Código QWeather ${data.code}: ${getQWeatherErrorMessage(data.code)}`);
+                        return;
+                    }
+
+                    displayTideData(data, locationId);
+
+                } catch (error) {
+                    console.error('Erro geral ao buscar a API:', error);
+                    displayError('Falha na comunicação com o endpoint Vercel/QWeather. Verifique a URL e a rede.');
+                } finally {
+                    loadingIndicator.classList.add('hidden');
+                    fetchButton.disabled = false;
+                }
+            }
+
+            function getQWeatherErrorMessage(code) {
+                const messages = {
+                    '400': 'Parâmetros inválidos (URL malformada).',
+                    '401': 'Chave de API inválida ou expirada.',
+                    '402': 'Limite de consultas excedido.',
+                    '403': 'Sem permissão para acessar esta API ou localização.',
+                    '404': 'Nenhum dado encontrado para a localização e data.',
+                    '500': 'Erro interno do servidor QWeather.'
+                };
+                return messages[code] || 'Erro de código desconhecido.';
+            }
+
+            function displayError(message) {
+                errorTextP.textContent = message;
+                errorMessageDiv.classList.remove('hidden');
+                tideResultsDiv.innerHTML = '';
+                basicInfoDiv.innerHTML = '';
+            }
+
+            function displayTideData(data, locationId) {
+                tideResultsDiv.innerHTML = '';
+                basicInfoDiv.innerHTML = '';
+                
+                if (!data.tide || data.tide.length === 0) {
+                    displayError('Nenhum evento de maré (Alta/Baixa) encontrado para esta data.');
+                    return;
+                }
+
+                // 1. Informações Básicas
+                basicInfoDiv.innerHTML = `
+                    <p class="mb-2">
+                        <span class="font-semibold text-blue-700">Localização Consultada:</span> ${locationId}
+                    </p>
+                    <p class="mb-2">
+                        <span class="font-semibold text-blue-700">Horário da Última Atualização:</span> 
+                        ${formatTime(data.updateTime)} (Fuso Horário Local)
+                    </p>
+                `;
+
+
+                // 2. Tabela de Marés
+                const tableHtml = `
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3 border-b pb-2">Eventos de Maré</h2>
+                    <div class="overflow-x-auto shadow-lg rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200 bg-white">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Tipo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Horário</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Altura (Metros)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.tide.map(tide => {
+                                    const typeText = tide.level === '1' ? 'Maré Alta (High)' : 'Maré Baixa (Low)';
+                                    const typeClass = tide.level === '1' ? 'tide-high' : 'tide-low';
+                                    const icon = tide.level === '1' ? '🔼' : '🔽';
+                                    
+                                    return `
+                                        <tr class="${typeClass}">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
+                                                <span class="mr-2 text-lg">${icon}</span> ${typeText}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-lg font-semibold text-gray-700">
+                                                ${formatTime(tide.fxTime)}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                ${tide.height} m
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                tideResultsDiv.innerHTML = tableHtml;
+            }
+
+            // Garante que a data atual é pré-selecionada ao carregar
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now.getTime() - offset)).toISOString().substring(0, 10);
+            dateInput.value = localISOTime;
+
+            // Tenta buscar os dados iniciais ao carregar a página com os valores padrão
+            // fetchTideData(); // Comentado para não gastar consultas automaticamente. O usuário deve clicar.
+        });
+    </script>
 </body>
 </html>
