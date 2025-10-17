@@ -31,6 +31,14 @@ export default async function handler(request, response) {
         // 4. Faz a requisição à QWeather API usando fetch nativo
         const qweatherResponse = await fetch(QWEATHER_URL);
         
+        // NOVO: Adiciona log detalhado em caso de erro HTTP (ex: 403) na chamada para QWeather
+        if (!qweatherResponse.ok) {
+            // Clona a resposta para poder ler o corpo (para debug) e ainda passá-la adiante
+            const errorBodyText = await qweatherResponse.clone().text();
+            console.error(`ERRO NA CHAMADA QWEATHER (STATUS: ${qweatherResponse.status})`);
+            console.error('Corpo da Resposta QWeather (para debug):', errorBodyText);
+        }
+
         // 5. Retorna o conteúdo (JSON) da QWeather diretamente para o frontend
         const data = await qweatherResponse.json();
 
@@ -38,6 +46,7 @@ export default async function handler(request, response) {
         response.setHeader('Access-Control-Allow-Origin', '*');
         response.setHeader('Content-Type', 'application/json');
 
+        // Retorna o status original da QWeather (incluindo o 403)
         return response.status(qweatherResponse.status).json(data);
 
     } catch (error) {
