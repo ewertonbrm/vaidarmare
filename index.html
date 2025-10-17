@@ -2,103 +2,131 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Tábua de Marés - QWeather API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tábua de Marés - Natal/RN</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #eef6ff;
+      background: #eef6fb;
       color: #222;
-      text-align: center;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
     }
-    h1 { color: #0050a0; }
-    .day {
+    header {
+      background: #0077b6;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
       background: white;
       border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      padding: 15px;
-      margin: 15px auto;
-      max-width: 600px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem 1.5rem;
+    }
+    h2 {
+      border-bottom: 2px solid #0077b6;
+      padding-bottom: 0.3rem;
+    }
+    .tide {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+      text-align: center;
     }
     .api-url {
-      font-size: 0.9em;
-      color: #333;
-      background: #dfefff;
-      padding: 8px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      word-break: break-all;
-    }
-    table {
-      margin: auto;
-      border-collapse: collapse;
-      width: 80%;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px 10px;
-    }
-    th {
-      background: #f0f7ff;
+      font-size: 0.85rem;
+      color: #555;
+      word-wrap: break-word;
+      margin-top: 0.5rem;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Tábua de Marés - Natal/RN 🌊</h1>
-  <div class="api-url" id="apiUrl"></div>
-  <div id="content">Carregando dados...</div>
+  <header>
+    <h1>Tábua de Marés - Natal/RN 🌊</h1>
+  </header>
+  <main>
+    <div id="api-url" class="api-url"></div>
+    <div id="content">Carregando dados...</div>
+  </main>
 
   <script>
-    const baseUrl = "https://api.qweather.com/v7/ocean/tide"; // ✅ domínio sem bloqueio CORS
-    const location = "P2902"; // Estação Natal/RN
-    const key = "77b43510d8844b3ab3eb6e30392f3b2a";
+    const apiKey = "77b43510d8844b3ab3eb6e30392f3b2a";
+    const locationCode = "P2902"; // Natal/RN
+    const proxy = "https://corsproxy.io/?";
+    const baseURL = `https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide`;
 
-    // Função para converter UTC em horário local
-    function utcToLocal(utcTime) {
-      const date = new Date(utcTime + "Z");
-      return date.toLocaleString("pt-BR", { timeZoneName: "short" });
+    function getDateOffset(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0].replace(/-/g, '');
     }
 
-    async function carregarTabelas() {
-      const hoje = new Date();
-      const datas = [
-        hoje.toISOString().split("T")[0].replace(/-/g, ""),
-        new Date(hoje.getTime() + 86400000).toISOString().split("T")[0].replace(/-/g, "")
-      ];
+    async function fetchTides(date) {
+      const url = `${baseURL}?location=${locationCode}&date=${date}&key=${apiKey}`;
+      document.getElementById("api-url").textContent = url;
+      const response = await fetch(proxy + encodeURIComponent(url));
+      if (!response.ok) throw new Error("Erro ao acessar API");
+      const data = await response.json();
+      return data;
+    }
 
-      const apiUrlDiv = document.getElementById("apiUrl");
-      apiUrlDiv.textContent = `${baseUrl}?location=${location}&date=${datas[0]}&key=${key}`;
+    function formatTime(utcTime) {
+      const date = new Date(utcTime);
+      return date.toLocaleString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "2-digit",
+        month: "2-digit",
+        timeZoneName: "short"
+      });
+    }
 
+    async function loadTides() {
       const content = document.getElementById("content");
-      let html = "";
+      content.textContent = "Carregando dados...";
+      try {
+        const today = getDateOffset(0);
+        const tomorrow = getDateOffset(1);
+        const [todayData, tomorrowData] = await Promise.all([
+          fetchTides(today),
+          fetchTides(tomorrow)
+        ]);
 
-      for (const data of datas) {
-        const apiUrl = `${baseUrl}?location=${location}&date=${data}&key=${key}`;
-
-        try {
-          const resp = await fetch(apiUrl);
-          if (!resp.ok) throw new Error("Erro HTTP " + resp.status);
-          const json = await resp.json();
-
-          html += `<div class="day"><h2>${data.slice(6,8)}/${data.slice(4,6)}/${data.slice(0,4)}</h2>`;
-          if (json.tideTable && json.tideTable.length > 0) {
-            html += "<table><tr><th>Hora Local</th><th>Nível (cm)</th></tr>";
-            for (const mar of json.tideTable) {
-              html += `<tr><td>${utcToLocal(mar.time)}</td><td>${mar.height} cm</td></tr>`;
-            }
-            html += "</table>";
+        let html = "";
+        const renderDay = (label, data) => {
+          html += `<h2>${label}</h2>`;
+          if (data && data.tideTable && data.tideTable.tide.length > 0) {
+            data.tideTable.tide.forEach(t => {
+              html += `
+                <div class="tide">
+                  <strong>${t.type}</strong>: ${formatTime(t.time)} — ${t.height} m
+                </div>
+              `;
+            });
           } else {
-            html += "<p>Sem dados disponíveis.</p>";
+            html += `<p>Sem dados disponíveis.</p>`;
           }
-          html += "</div>";
-        } catch (err) {
-          html += `<p>Erro ao acessar dados de ${data}: ${err.message}</p>`;
-        }
+        };
+
+        renderDay("Hoje", todayData);
+        renderDay("Amanhã", tomorrowData);
+        content.innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        content.innerHTML = `<p class="error">Erro ao carregar dados da API.</p>`;
       }
-      content.innerHTML = html;
     }
 
-    carregarTabelas();
+    loadTides();
   </script>
 </body>
 </html>
