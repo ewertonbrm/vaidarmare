@@ -29,31 +29,48 @@
       margin-bottom: 20px;
       word-break: break-all;
     }
+    .log {
+      font-size: 0.8em;
+      color: #555;
+      background: #fafafa;
+      border: 1px solid #ccc;
+      padding: 5px;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 600px;
+      text-align: left;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h1>Tábua de Marés - Natal/RN 🌊</h1>
   <div class="api-url" id="apiUrl"></div>
   <div id="content">Carregando dados...</div>
+  <div class="log" id="log"></div>
 
   <script>
     const baseUrl = "https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide";
     const location = "P2902";
     const key = "77b43510d8844b3ab3eb6e30392f3b2a";
-    const proxy = "https://api.allorigins.win/raw?url=";
+    const proxy = "https://corsproxy.io/?"; // Proxy alternativo mais compatível
 
-    // Função para converter UTC em hora local
+    function log(msg) {
+      const el = document.getElementById("log");
+      el.textContent += msg + "\n";
+    }
+
+    // Converte UTC → local
     function utcToLocal(utcTime) {
       const date = new Date(utcTime + "Z");
       return date.toLocaleString("pt-BR", { timeZoneName: "short" });
     }
 
-    // Função principal
     async function carregarTabelas() {
       const hoje = new Date();
       const datas = [
-        hoje.toISOString().slice(0,10).replace(/-/g, ""),
-        new Date(hoje.getTime() + 86400000).toISOString().slice(0,10).replace(/-/g, "")
+        hoje.toISOString().split("T")[0].replace(/-/g, ""),
+        new Date(hoje.getTime() + 86400000).toISOString().split("T")[0].replace(/-/g, "")
       ];
 
       const content = document.getElementById("content");
@@ -65,11 +82,16 @@
       for (const data of datas) {
         const apiUrl = `${baseUrl}?location=${location}&date=${data}&key=${key}`;
         const fullUrl = proxy + encodeURIComponent(apiUrl);
+        log("Consultando: " + apiUrl);
 
         try {
           const resp = await fetch(fullUrl);
+          log("Status: " + resp.status + " " + resp.statusText);
+
           if (!resp.ok) throw new Error("Erro HTTP");
+
           const json = await resp.json();
+          log("Resposta: " + JSON.stringify(json, null, 2).slice(0, 500) + "...");
 
           html += `<div class="day"><h2>${data.slice(6,8)}/${data.slice(4,6)}/${data.slice(0,4)}</h2>`;
           if (json.tideTable && json.tideTable.length > 0) {
@@ -84,6 +106,7 @@
           html += "</div>";
         } catch (err) {
           html += `<p>Erro ao acessar dados de ${data}: ${err.message}</p>`;
+          log("Erro: " + err);
         }
       }
       content.innerHTML = html;
