@@ -29,17 +29,17 @@
       margin-bottom: 20px;
       word-break: break-all;
     }
-    .log {
-      font-size: 0.8em;
-      color: #555;
-      background: #fafafa;
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+    th, td {
       border: 1px solid #ccc;
-      padding: 5px;
-      margin: 10px auto;
-      width: 90%;
-      max-width: 600px;
-      text-align: left;
-      white-space: pre-wrap;
+      padding: 6px 10px;
+    }
+    th {
+      background: #f0f7ff;
     }
   </style>
 </head>
@@ -47,20 +47,13 @@
   <h1>Tábua de Marés - Natal/RN 🌊</h1>
   <div class="api-url" id="apiUrl"></div>
   <div id="content">Carregando dados...</div>
-  <div class="log" id="log"></div>
 
   <script>
-    const baseUrl = "https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide";
-    const location = "P2902";
+    const baseUrl = "https://api.qweather.com/v7/ocean/tide"; // ✅ domínio sem bloqueio CORS
+    const location = "P2902"; // Estação Natal/RN
     const key = "77b43510d8844b3ab3eb6e30392f3b2a";
-    const proxy = "https://corsproxy.io/?"; // Proxy alternativo mais compatível
 
-    function log(msg) {
-      const el = document.getElementById("log");
-      el.textContent += msg + "\n";
-    }
-
-    // Converte UTC → local
+    // Função para converter UTC em horário local
     function utcToLocal(utcTime) {
       const date = new Date(utcTime + "Z");
       return date.toLocaleString("pt-BR", { timeZoneName: "short" });
@@ -73,29 +66,23 @@
         new Date(hoje.getTime() + 86400000).toISOString().split("T")[0].replace(/-/g, "")
       ];
 
-      const content = document.getElementById("content");
       const apiUrlDiv = document.getElementById("apiUrl");
       apiUrlDiv.textContent = `${baseUrl}?location=${location}&date=${datas[0]}&key=${key}`;
 
+      const content = document.getElementById("content");
       let html = "";
 
       for (const data of datas) {
         const apiUrl = `${baseUrl}?location=${location}&date=${data}&key=${key}`;
-        const fullUrl = proxy + encodeURIComponent(apiUrl);
-        log("Consultando: " + apiUrl);
 
         try {
-          const resp = await fetch(fullUrl);
-          log("Status: " + resp.status + " " + resp.statusText);
-
-          if (!resp.ok) throw new Error("Erro HTTP");
-
+          const resp = await fetch(apiUrl);
+          if (!resp.ok) throw new Error("Erro HTTP " + resp.status);
           const json = await resp.json();
-          log("Resposta: " + JSON.stringify(json, null, 2).slice(0, 500) + "...");
 
           html += `<div class="day"><h2>${data.slice(6,8)}/${data.slice(4,6)}/${data.slice(0,4)}</h2>`;
           if (json.tideTable && json.tideTable.length > 0) {
-            html += "<table style='margin:auto'><tr><th>Hora Local</th><th>Nível (cm)</th></tr>";
+            html += "<table><tr><th>Hora Local</th><th>Nível (cm)</th></tr>";
             for (const mar of json.tideTable) {
               html += `<tr><td>${utcToLocal(mar.time)}</td><td>${mar.height} cm</td></tr>`;
             }
@@ -106,7 +93,6 @@
           html += "</div>";
         } catch (err) {
           html += `<p>Erro ao acessar dados de ${data}: ${err.message}</p>`;
-          log("Erro: " + err);
         }
       }
       content.innerHTML = html;
