@@ -1,7 +1,5 @@
-import fetch from 'node-fetch';
-
-// Esta função Serverless é executada no Vercel e atua como proxy.
-// Ela esconde a chave de API que é lida da variável de ambiente.
+// FUNÇÃO AGORA USA O 'FETCH' NATIVO DO NODE.JS 20.X
+// Removida a linha 'import fetch from "node-fetch";'
 
 export default async function handler(request, response) {
     // 1. Recebe os parâmetros do frontend (location e date)
@@ -18,9 +16,11 @@ export default async function handler(request, response) {
     const API_KEY = process.env.QWEATHER_API_KEY;
 
     if (!API_KEY) {
+        // Retorna um erro específico se a variável não estiver configurada no Vercel
+        console.error('ERRO: Variável QWEATHER_API_KEY não definida.');
         return response.status(500).json({ 
             code: '500', 
-            message: 'Chave de API (QWEATHER_API_KEY) não configurada no Vercel.' 
+            message: 'Erro de Servidor: Chave de API (QWEATHER_API_KEY) não configurada nas variáveis de ambiente do Vercel.' 
         });
     }
 
@@ -28,7 +28,7 @@ export default async function handler(request, response) {
     const QWEATHER_URL = `https://api.qweather.com/v7/ocean/tide?location=${location}&date=${date}&key=${API_KEY}`;
     
     try {
-        // 4. Faz a requisição à QWeather API
+        // 4. Faz a requisição à QWeather API usando fetch nativo
         const qweatherResponse = await fetch(QWEATHER_URL);
         
         // 5. Retorna o conteúdo (JSON) da QWeather diretamente para o frontend
