@@ -136,8 +136,9 @@ sans: ['Inter', 'sans-serif'],
                     errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
                 } else if (data.code) {
                     // Trata erros específicos da API QWeather, como 400
-                     errorMessage = `Erro na API QWeather (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
+                     errorMessage = `Erro na API QWEATHER (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
                 } else if (data.error) {
+                    // Trata erros da Serverless Function (ex: erro 500)
                     errorMessage = `Erro do Servidor (500): ${data.error}`;
                 } else {
                     errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
