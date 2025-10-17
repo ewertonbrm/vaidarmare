@@ -1,60 +1,69 @@
-// FUNÇÃO AGORA USA O 'FETCH' NATIVO DO NODE.JS 20.X
-// Removida a linha 'import fetch from "node-fetch";'
+import { URLSearchParams } from 'url';
 
-export default async function handler(request, response) {
-    // 1. Recebe os parâmetros do frontend (location e date)
-    const { location, date } = request.query;
+// O domínio base da API da QWeather, usando o domínio customizado do usuário.
+const QWEATHER_BASE_URL = 'https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide';
 
-    if (!location || !date) {
-        return response.status(400).json({ 
-            code: '400', 
-            message: 'Parâmetros location e date são obrigatórios.' 
-        });
-    }
+// Handler principal para a Vercel Serverless Function
+export default async function handler(req, res) {
+// Definir cabeçalhos para permitir CORS, embora a Vercel trate a maioria
+res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // 2. Obtém a chave da API de forma SEGURA através das Variáveis de Ambiente do Vercel
-    const API_KEY = process.env.QWEATHER_API_KEY;
+// Resposta rápida para requests OPTIONS (preflight CORS)
+if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+}
 
-    if (!API_KEY) {
-        // Retorna um erro específico se a variável não estiver configurada no Vercel
-        console.error('ERRO: Variável QWEATHER_API_KEY não definida.');
-        return response.status(500).json({ 
-            code: '500', 
-            message: 'Erro de Servidor: Chave de API (QWEATHER_API_KEY) não configurada nas variáveis de ambiente do Vercel.' 
-        });
-    }
+// A chave de API é lida de forma segura da Variável de Ambiente do Vercel
+const API_KEY = process.env.QWEATHER_API_KEY;
 
-    // 3. Constrói a URL para a QWeather (Usamos a API base oficial)
-    const QWEATHER_URL = `https://api.qweather.com/v7/ocean/tide?location=${location}&date=${date}&key=${API_KEY}`;
+if (!API_KEY) {
+    console.error("ERRO: QWEATHER_API_KEY não está configurada como Variável de Ambiente no Vercel.");
+    return res.status(500).json({ error: 'Configuração Incompleta do Servidor.', details: 'Chave de API ausente.' });
+}
+
+// Extrair location e date da query string do frontend
+const { location, date } = req.query;
+
+if (!location || !date) {
+    return res.status(400).json({ error: 'Parâmetros Ausentes.', details: 'Localização (location) e Data (date) são obrigatórios.' });
+}
+
+// Construir a URL final para a QWeather API
+const finalUrl = new URL(QWEATHER_BASE_URL);
+finalUrl.searchParams.append('location', location);
+finalUrl.searchParams.append('date', date);
+finalUrl.searchParams.append('key', API_KEY); // Adiciona a chave de forma secreta
+
+console.log(`DEBUG: Chamando API QWeather: ${finalUrl.toString()}`);
+
+try {
+    const apiResponse = await fetch(finalUrl.toString());
     
-    try {
-        // 4. Faz a requisição à QWeather API usando fetch nativo
-        const qweatherResponse = await fetch(QWEATHER_URL);
+    // Se a resposta não for OK (ex: 400, 403), lemos o erro para diagnóstico
+    if (!apiResponse.ok) {
+        const errorBody = await apiResponse.text();
         
-        // NOVO: Adiciona log detalhado em caso de erro HTTP (ex: 403) na chamada para QWeather
-        if (!qweatherResponse.ok) {
-            // Clona a resposta para poder ler o corpo (para debug) e ainda passá-la adiante
-            const errorBodyText = await qweatherResponse.clone().text();
-            console.error(`ERRO NA CHAMADA QWEATHER (STATUS: ${qweatherResponse.status})`);
-            console.error('Corpo da Resposta QWeather (para debug):', errorBodyText);
-        }
+        console.error(`ERRO NA CHAMADA QWEATHER (STATUS: ${apiResponse.status})`);
+        console.error(`Corpo da Resposta QWeather (para debug): ${errorBody}`);
 
-        // 5. Retorna o conteúdo (JSON) da QWeather diretamente para o frontend
-        const data = await qweatherResponse.json();
-
-        // Configura o cabeçalho CORS para permitir que o frontend acesse
-        response.setHeader('Access-Control-Allow-Origin', '*');
-        response.setHeader('Content-Type', 'application/json');
-
-        // Retorna o status original da QWeather (incluindo o 403)
-        return response.status(qweatherResponse.status).json(data);
-
-    } catch (error) {
-        console.error('Erro na chamada da API QWeather:', error);
-        return response.status(500).json({ 
-            code: '500', 
-            message: 'Falha interna ao se comunicar com a API QWeather.',
-            details: error.message 
+        // Envia o status e a mensagem de erro para o frontend
+        return res.status(apiResponse.status).json({ 
+            error: 'Erro na API QWeather. Verifique a chave e o domínio.', 
+            status: apiResponse.status,
+            details: errorBody 
         });
     }
+
+    // Se a resposta for OK (200), retorna o JSON diretamente
+    const data = await apiResponse.json();
+    return res.status(200).json(data);
+
+} catch (error) {
+    console.error('Erro na requisição para a QWeather API:', error);
+    return res.status(500).json({ error: 'Falha na Conexão com o Servidor Externo.', details: error.message });
+}
+
+
 }
