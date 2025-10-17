@@ -76,8 +76,8 @@
                 </div>
             </div>
             
-            <p class="text-xs text-gray-500 mt-2">
-                *O endpoint base e a chave são definidos no JavaScript para esta demonstração. Ajuste-os conforme sua configuração Vercel/QWeather.
+            <p class="text-xs text-gray-500 mt-2 text-red-600 font-semibold">
+                *Chamada de API feita de forma SEGURA via Vercel Serverless Function em `/api/tide`.
             </p>
         </section>
 
@@ -122,18 +122,13 @@
             const basicInfoDiv = document.getElementById('basicInfo');
 
             // 1. Configurações da API QWeather
-            // ATENÇÃO: Use um endpoint Vercel REWRITE ou EDGE FUNCTION para ocultar a chave (KEY)
-            // A URL BASE e KEY fornecidas pelo usuário são usadas aqui para DEMONSTRAÇÃO.
-            const API_BASE_URL = 'https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide';
-            const API_KEY = '77b43510d8844b3ab3eb6e30392f3b2a'; // Chave QWeather
-
-            // Preenche a data com o dia atual por padrão
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            dateInput.value = `${year}-${month}-${day}`;
+            // Chamamos a função Serverless: '/api/tide'
+            const API_BASE_URL = '/api/tide'; 
             
+            // Preenche a data com o dia atual por padrão
+            // MUDANÇA AQUI: Define o valor padrão para a data de teste (2025-10-19)
+            dateInput.value = '2025-10-19';
+
             // Adiciona um listener ao botão
             fetchButton.addEventListener('click', fetchTideData);
 
@@ -164,8 +159,9 @@
                 // Formata a data para YYYYMMDD (formato da API)
                 const dateFormatted = dateRaw.replace(/-/g, '');
 
-                // Constrói a URL completa
-                const url = `${API_BASE_URL}?location=${locationId}&date=${dateFormatted}&key=${API_KEY}`;
+                // Constrói a URL para a função serverless, passando location e date como query parameters
+                // A função serverless (api/tide.js) adicionará a chave de forma secreta.
+                const url = `${API_BASE_URL}?location=${locationId}&date=${dateFormatted}`;
 
                 // Limpa resultados anteriores e mostra o indicador de carregamento
                 tideResultsDiv.innerHTML = '';
@@ -186,11 +182,7 @@
                     if (!response.ok) {
                         // Tenta ler o erro do corpo da resposta, se disponível
                         let errorDetail = await response.json().catch(() => ({}));
-                        let errorMsg = `HTTP Erro ${response.status}: ${errorDetail.code || 'Erro desconhecido'}.`;
-                        if (errorDetail.code === '404' && response.status === 200) {
-                            // O QWeather usa o código 404 no corpo da resposta para 'sem dados'
-                            errorMsg = 'Nenhum dado de maré encontrado para esta localização e data.';
-                        }
+                        let errorMsg = `HTTP Erro ${response.status}: ${errorDetail.message || errorDetail.code || 'Erro desconhecido.'}`;
                         displayError(errorMsg);
                         return;
                     }
@@ -238,6 +230,7 @@
                 basicInfoDiv.innerHTML = '';
                 
                 if (!data.tide || data.tide.length === 0) {
+                    // ESTA É A MENSAGEM QUE VOCÊ ESTÁ RECEBENDO, indicando que o array de dados está vazio.
                     displayError('Nenhum evento de maré (Alta/Baixa) encontrado para esta data.');
                     return;
                 }
@@ -294,14 +287,10 @@
                 tideResultsDiv.innerHTML = tableHtml;
             }
 
-            // Garante que a data atual é pré-selecionada ao carregar
-            const now = new Date();
-            const offset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now.getTime() - offset)).toISOString().substring(0, 10);
-            dateInput.value = localISOTime;
+            // Garante que a data de teste inicial (2025-10-19) é pré-selecionada ao carregar
+            // Este valor deve ter dados de maré, aumentando a chance de sucesso
+            dateInput.value = '2025-10-19';
 
-            // Tenta buscar os dados iniciais ao carregar a página com os valores padrão
-            // fetchTideData(); // Comentado para não gastar consultas automaticamente. O usuário deve clicar.
         });
     </script>
 </body>
