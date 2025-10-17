@@ -93,7 +93,7 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
-        const apiUrlDisplayInput = document.getElementById('apiUrlDisplay'); // Novo elemento
+        const apiUrlDisplayInput = document.getElementById('apiUrlDisplay');
 
         // CRÍTICO: Domínio base da API da QWeather, copiado da função Serverless.
         const QWEATHER_EXTERNAL_BASE_URL = 'https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide';
@@ -170,8 +170,11 @@
                 
                 // A QWeather usa o código '200' para sucesso
                 if (data.code === '200') {
-                    if (data.tide && data.tide.length > 0) {
-                        displayTideData(data.tide);
+                    // *** CORREÇÃO CRÍTICA: MUDAR data.tide PARA data.tideTable ***
+                    const tideEvents = data.tideTable; 
+
+                    if (tideEvents && tideEvents.length > 0) {
+                        displayTideData(tideEvents);
                     } else {
                         // Caso a API retorne sucesso, mas sem dados de maré
                         message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data/localização.';
@@ -202,7 +205,8 @@
             `;
             
             tideEvents.forEach(event => {
-                const isHighTide = event.type === '0'; // 0: Maré Alta, 1: Maré Baixa
+                // *** CORREÇÃO CRÍTICA: MUDAR event.type === '0' PARA event.type === 'H' ***
+                const isHighTide = event.type === 'H'; 
                 const icon = isHighTide ? '▲' : '▼';
                 const color = isHighTide ? 'text-blue-600' : 'text-green-600';
                 const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
