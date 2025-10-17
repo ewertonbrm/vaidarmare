@@ -9,8 +9,20 @@
       font-family: Arial, sans-serif;
       margin: 20px;
       background: #e0f7fa;
+      color: #003b46;
     }
-    h1 { text-align: center; }
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    p#apiURL {
+      text-align: center;
+      font-size: 0.9em;
+      color: #004d40;
+      background: #b2ebf2;
+      padding: 6px;
+      border-radius: 8px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -26,15 +38,12 @@
       background: #00acc1;
       color: white;
     }
-    caption {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
   </style>
 </head>
 <body>
 
 <h1>Tábua de Marés - Natal/RN</h1>
+<p id="apiURL"></p>
 
 <table id="tideTable">
   <thead>
@@ -52,15 +61,17 @@
 </table>
 
 <script>
-const lat = -5.7945; // Natal RN
+const lat = -5.7945;  // Natal RN
 const lon = -35.211;
-const apiKey = 77b43510d8844b3ab3eb6e30392f3b2a; // Coloque sua API Key
+const apiKey = "77b43510d8844b3ab3eb6e30392f3b2a"; // sua chave
+const apiURL = `https://devapi.qweather.com/v7/tide?location=${lat},${lon}&key=${apiKey}&unit=m&lang=pt`;
 
-// Converte horário da API (UTC+8) para horário local de Natal (UTC-3)
+document.getElementById("apiURL").textContent = apiURL;
+
+// Converte horário UTC+8 (API) para UTC-3 (Natal/RN)
 function convertToLocalTime(apiTimeStr) {
-  const utcTime = new Date(apiTimeStr + "+08:00"); // API retorna UTC+8
-  // Ajuste para UTC-3 (Natal)
-  const localTime = new Date(utcTime.getTime() - (11 * 60 * 60 * 1000)); // 8 - (-3) = 11h de diferença
+  const utcTime = new Date(apiTimeStr + "+08:00"); 
+  const localTime = new Date(utcTime.getTime() - (11 * 60 * 60 * 1000)); // UTC+8 → UTC-3
   const hours = localTime.getHours().toString().padStart(2, "0");
   const minutes = localTime.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
@@ -68,7 +79,7 @@ function convertToLocalTime(apiTimeStr) {
 
 async function fetchTides() {
   try {
-    const res = await fetch(`https://devapi.qweather.com/v7/tide?location=${lat},${lon}&key=${apiKey}&unit=m&lang=pt`);
+    const res = await fetch(apiURL);
     const data = await res.json();
 
     if (data.code !== "200") {
@@ -79,12 +90,11 @@ async function fetchTides() {
     const tbody = document.querySelector("#tideTable tbody");
     tbody.innerHTML = "";
 
-    // Pegar só hoje e amanhã
-    const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+    const today = new Date().toISOString().slice(0, 10);
     const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().slice(0, 10);
 
     data.tide.forEach(day => {
-      if(day.date !== today && day.date !== tomorrow) return;
+      if (day.date !== today && day.date !== tomorrow) return;
 
       const high = day.highTide || [];
       const low = day.lowTide || [];
@@ -107,10 +117,8 @@ async function fetchTides() {
   }
 }
 
-// Atualiza automaticamente ao carregar
 fetchTides();
 </script>
 
 </body>
 </html>
-
