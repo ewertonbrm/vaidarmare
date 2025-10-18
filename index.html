@@ -3,248 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tábua de Marés QWeather</title>
-    <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
+    <title>Vai Dar Maré! (Natal/RN)</title>
+    <!-- Carrega o Tailwind CSS para styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Define a fonte Inter como padrão */
+        /* Custom font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7fafc; /* light blue-gray background */
-        }
-        /* Estilos adicionais para botões e cards */
-        .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(229, 231, 235, 0.6);
+            background-color: #f0f8ff; /* Azul muito claro */
+            color: #1e3a8a; /* Azul marinho escuro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
     </style>
-    <!-- Inicia o Tailwind com a fonte Inter -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="bg-blue-50">
 
-    <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
-        <h1 class="text-3xl font-extrabold text-center text-blue-800 mb-6">Consulta de Tábua de Marés</h1>
-        
-        <!-- Formulário de Consulta -->
-        <form id="tideForm" class="space-y-4">
-            
-            <div>
-                <label for="locationId" class="block text-sm font-medium text-gray-700">ID da Localização (Ex: P2902)</label>
-                <input type="text" id="locationId" value="P2902" required 
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
+<div id="app" class="w-full max-w-md bg-white p-6 md:p-8 rounded-2xl shadow-2xl transform transition duration-500 hover:shadow-3xl">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-center mb-6 text-teal-600">
+        Vai Dar Maré!
+    </h1>
 
-            <div>
-                <label for="dateInput" class="block text-sm font-medium text-gray-700">Data da Consulta</label>
-                <input type="date" id="dateInput" required 
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
+    <!-- Formulário de Consulta -->
+    <div class="space-y-4 mb-8">
+        <!-- Localização Fixa (P24427 - Natal/RN) -->
+        <p class="text-sm font-semibold text-gray-500 text-center">
+            Localização Fixa: Natal/RN (ID P24427)
+        </p>
 
-            <button type="submit" id="submitBtn" 
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-[1.01]">
-                <span id="btnText">Consultar Marés</span>
-            </button>
-        </form>
-
-        <!-- Novo campo para exibir o endereço da API -->
-        <div class="mt-4">
-            <label for="apiUrlDisplay" class="block text-xs font-medium text-gray-400">URL Externa COMPLETA Sendo Acessada (Chave Oculta)</label>
-            <input type="text" id="apiUrlDisplay" readonly value="A URL completa aparecerá após a primeira consulta."
-                   class="mt-1 block w-full px-4 py-1 text-xs border border-gray-200 rounded-md bg-gray-100 text-gray-600 cursor-default">
+        <!-- Campo de Data -->
+        <div>
+            <label for="date-input" class="block text-sm font-medium text-blue-800 mb-1">Selecione a Data:</label>
+            <input type="date" id="date-input" class="w-full p-3 border border-blue-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" value="2025-10-19">
         </div>
 
-        <!-- Área de Resultados e Mensagens -->
-        <div id="resultsContainer" class="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
-            <p id="message" class="text-gray-500 text-center">Insira a localização e a data para consultar a tábua de marés.</p>
-            <div id="tideList" class="w-full mt-4 space-y-3 hidden">
-                <!-- Resultados da API serão injetados aqui -->
-            </div>
-            <!-- Ícone de Carregamento (Hidden by default) -->
-            <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-blue-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <!-- Botão de Consulta -->
+        <button id="query-button" class="w-full p-3 font-semibold text-white rounded-lg bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-teal-300">
+            Consultar Marés
+        </button>
+    </div>
+
+    <!-- Resultados -->
+    <div id="results-container" class="space-y-4">
+        <h2 class="text-xl font-bold text-blue-800 border-b pb-2 mb-4">
+            Eventos de Maré de Natal/RN
+        </h2>
+        
+        <!-- Placeholder/Mensagens -->
+        <div id="loading-message" class="hidden text-center text-teal-600">
+            <svg class="animate-spin h-5 w-5 mr-3 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
+            Buscando dados...
         </div>
-        
-        <!-- Créditos e Informações de Debug -->
-        <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela QWeather. Integração via Vercel Serverless Function.</p>
+        <div id="error-message" class="hidden p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg"></div>
+        <ul id="tide-list" class="space-y-3">
+            <!-- Os resultados serão injetados aqui -->
+        </ul>
     </div>
+</div>
 
-    <script>
-        const form = document.getElementById('tideForm');
-        const locationIdInput = document.getElementById('locationId');
-        const dateInput = document.getElementById('dateInput');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const message = document.getElementById('message');
-        const tideList = document.getElementById('tideList');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const apiUrlDisplayInput = document.getElementById('apiUrlDisplay');
+<script>
+    // Configurações Globais
+    const API_BASE_PATH = '/api/tide';
+    const LOCATION_ID = 'P24427'; // Natal/RN
 
-        // CRÍTICO: Domínio base da API da QWeather, copiado da função Serverless.
-        const QWEATHER_EXTERNAL_BASE_URL = 'https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide';
+    // Elementos do DOM
+    const dateInput = document.getElementById('date-input');
+    const queryButton = document.getElementById('query-button');
+    const loadingMessage = document.getElementById('loading-message');
+    const errorMessage = document.getElementById('error-message');
+    const tideList = document.getElementById('tide-list');
 
-        // Define a data padrão como 2025-10-19, conforme o exemplo funcional
-        const today = new Date();
-        const defaultDate = '2025-10-19'; 
-        dateInput.value = defaultDate;
+    // Funções de Utilidade
+    function showLoading(show) {
+        queryButton.disabled = show;
+        queryButton.textContent = show ? 'Consultando...' : 'Consultar Marés';
+        loadingMessage.classList.toggle('hidden', !show);
+        errorMessage.classList.add('hidden');
+        tideList.innerHTML = '';
+    }
 
-        // URL do nosso endpoint de proxy no Vercel
-        const API_BASE_URL = '/api/tide'; 
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+    }
 
-        // Função utilitária para formatar a data (YYYYMMDD)
-        const formatDate = (dateString) => {
-            const [year, month, day] = dateString.split('-');
-            return `${year}${month}${day}`;
-        };
-        
-        // Função utilitária para formatar a hora (HH:MM)
-        const formatTime = (time) => {
-            // Remove o fuso horário se estiver presente (e.g., "16:11+08")
-            return time.split('+')[0];
-        };
+    function formatTime(isoTime) {
+        // Ex: 2025-10-19T02:29-03:00 -> 02:29
+        try {
+            const date = new Date(isoTime);
+            return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+        } catch (e) {
+            return 'N/A';
+        }
+    }
 
-        // Função principal para buscar os dados
-        const fetchTideData = async (locationId, dateString) => {
-            const formattedDate = formatDate(dateString);
-            const url = `${API_BASE_URL}?location=${locationId}&date=${formattedDate}`; // URL Vercel Proxy
+    function renderTideEvent(event) {
+        const isHigh = event.type === 'H';
+        const typeText = isHigh ? 'Maré Alta' : 'Maré Baixa';
+        const typeClass = isHigh ? 'bg-blue-200 text-blue-900 border-blue-400' : 'bg-teal-100 text-teal-800 border-teal-400';
+        const heightUnit = event.height ? parseFloat(event.height).toFixed(2) + ' m' : 'N/A';
+        const formattedTime = formatTime(event.fxTime);
 
-            // 1. CONSTRÓI E EXIBE A URL EXTERNA COMPLETA (SEM A CHAVE SECRETA)
-            const externalDisplayUrl = `${QWEATHER_EXTERNAL_BASE_URL}?location=${locationId}&date=${formattedDate}&key=[CHAVE SECRETA OCULTA NO SERVIDOR]`;
-            apiUrlDisplayInput.value = externalDisplayUrl;
-            
-            // Resetar UI
-            tideList.classList.add('hidden');
-            tideList.innerHTML = '';
-            message.textContent = 'Consultando...';
-            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-green-100', 'border-green-400', 'bg-yellow-100', 'border-yellow-400');
-            loadingSpinner.classList.remove('hidden');
-            submitBtn.disabled = true;
-            btnText.textContent = 'Aguarde...';
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                // Lógica de tratamento de ERRO DE API (400, 403, 500, etc.)
-                if (!response.ok) {
-                    let errorMessage = 'Ocorreu um erro desconhecido na comunicação.';
-                    let bgColor = 'bg-red-100';
-                    let borderColor = 'border-red-400';
-
-                    if (response.status === 403) {
-                        errorMessage = 'ERRO QWEATHER (Código 403): Chave Inválida ou Serviço de Marés não ativado. Verifique a sua chave e plano na QWeather.';
-                    } else if (response.status === 404) {
-                        errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
-                    } else if (data.code) {
-                        // Trata erros específicos da API QWeather, como 400
-                         errorMessage = `Erro na API QWEATHER (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
-                    } else if (data.error) {
-                        // Trata erros da Serverless Function (ex: erro 500)
-                        errorMessage = `Erro do Servidor (500): ${data.error}`;
-                    } else {
-                        errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
-                    }
-                    
-                    // Exibir erro no container
-                    resultsContainer.classList.add(bgColor, borderColor);
-                    message.textContent = errorMessage;
-                    return;
-                }
+        return `
+            <li class="flex justify-between items-center p-4 rounded-xl border-l-4 ${typeClass} shadow-sm">
+                <!-- Altura (Destaque Principal) -->
+                <div class="text-3xl font-extrabold text-blue-800 flex-shrink-0">
+                    ${heightUnit}
+                </div>
                 
-                // Lógica de sucesso (response.ok é true)
-                
-                // A QWeather usa o código '200' para sucesso
-                if (data.code === '200') {
-                    // *** CORREÇÃO CRÍTICA: MUDAR data.tide PARA data.tideTable ***
-                    const tideEvents = data.tideTable; 
-
-                    if (tideEvents && tideEvents.length > 0) {
-                        displayTideData(tideEvents);
-                    } else {
-                        // Caso a API retorne sucesso, mas sem dados de maré
-                        message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data/localização.';
-                        resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
-                    }
-                } else {
-                    // Trata códigos de erro dentro do corpo da resposta JSON (ex: QWeather codes)
-                    message.textContent = `Erro na Consulta: Código ${data.code}. ${data.msg || 'Detalhe não disponível.'}`;
-                    resultsContainer.classList.add('bg-red-100', 'border-red-400');
-                }
-
-            } catch (error) {
-                // Erro de rede ou erro na função Serverless (ex: JSON.parse falhou)
-                console.error('Erro de rede ou Serverless Function:', error);
-                message.textContent = `Erro de Comunicação: Verifique a sua conexão ou os logs do Vercel. Detalhe: ${error.message}`;
-                resultsContainer.classList.add('bg-red-100', 'border-red-400');
-            } finally {
-                loadingSpinner.classList.add('hidden');
-                submitBtn.disabled = false;
-                btnText.textContent = 'Consultar Marés';
-            }
-        };
-
-        // Função para exibir os dados na lista
-        const displayTideData = (tideEvents) => {
-            tideList.innerHTML = `
-                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Eventos de Maré</h2>
-            `;
-            
-            tideEvents.forEach(event => {
-                // *** CORREÇÃO CRÍTICA: MUDAR event.type === '0' PARA event.type === 'H' ***
-                const isHighTide = event.type === 'H'; 
-                const icon = isHighTide ? '▲' : '▼';
-                const color = isHighTide ? 'text-blue-600' : 'text-green-600';
-                const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
-
-                const listItem = document.createElement('div');
-                listItem.className = `flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${isHighTide ? 'border-blue-200' : 'border-green-200'}`;
-                listItem.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-xl font-bold ${color}">${icon}</span>
-                        <div>
-                            <p class="font-medium text-gray-900">${label}</p>
-                            <p class="text-xs text-gray-500">Altura: ${event.height}m</p>
-                        </div>
+                <!-- Tipo e Hora -->
+                <div class="text-right">
+                    <div class="text-lg font-bold">
+                        ${typeText}
                     </div>
-                    <span class="text-lg font-bold text-gray-700">${formatTime(event.fxTime)}</span>
-                `;
-                tideList.appendChild(listItem);
-            });
+                    <div class="text-sm font-semibold text-gray-700 mt-1">
+                        às ${formattedTime}
+                    </div>
+                </div>
+            </li>
+        `;
+    }
 
-            message.textContent = '';
-            tideList.classList.remove('hidden');
-            resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100');
-            resultsContainer.classList.add('bg-green-100', 'border-green-400');
-        };
+    // Lógica da Consulta
+    async function fetchTideData() {
+        const rawDate = dateInput.value;
+        if (!rawDate) {
+            showError("Por favor, selecione uma data.");
+            return;
+        }
 
-        // Listener do Formulário
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const locationId = locationIdInput.value.trim();
-            const dateString = dateInput.value;
+        // Formata a data para YYYYMMDD (necessário pela QWeather)
+        const formattedDate = rawDate.replace(/-/g, '');
+        
+        // Constrói a URL para a Serverless Function do Vercel
+        const url = `${API_BASE_PATH}?location=${LOCATION_ID}&date=${formattedDate}`;
+
+        showLoading(true);
+
+        try {
+            const response = await fetch(url);
             
-            if (locationId && dateString) {
-                fetchTideData(locationId, dateString);
-            }
-        });
+            // O Vercel retorna a resposta JSON da QWeather
+            const data = await response.json();
 
-        // Inicializa o campo de exibição da URL
-        apiUrlDisplayInput.value = `${QWEATHER_EXTERNAL_BASE_URL}?location=[ID]&date=[YYYYMMDD]&key=[CHAVE SECRETA OCULTA]`;
-    </script>
+            // 1. Checagem de Erros da QWeather (código != 200)
+            if (data.code && data.code !== '200') {
+                const apiError = data.code === '403' 
+                    ? `ERRO QWEATHER (Código 403): Chave Inválida ou Serviço de Marés não ativado. Por favor, verifique no painel da QWeather.` 
+                    : `Erro QWeather (Código ${data.code}): ${data.code}`;
+                showError(apiError);
+                return;
+            }
+
+            // 2. Checagem de Dados Válidos (usando 'tideTable' conforme descoberto)
+            const tideEvents = data.tideTable; 
+
+            if (!tideEvents || tideEvents.length === 0) {
+                showError("Nenhum evento de maré (Alta/Baixa) encontrado para esta data ou localização.");
+                return;
+            }
+
+            // 3. Renderização dos Resultados
+            const html = tideEvents.map(renderTideEvent).join('');
+            tideList.innerHTML = html;
+
+        } catch (error) {
+            console.error("Erro no fetch:", error);
+            showError("Erro na comunicação com o servidor. Verifique sua conexão ou os logs do Vercel.");
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Listeners de Eventos
+    queryButton.addEventListener('click', fetchTideData);
+
+    // Inicialização (Setar a data inicial de teste no input)
+    window.onload = () => {
+        const today = new Date();
+        // Define a data de teste inicial (2025-10-19)
+        dateInput.value = "2025-10-19";
+        // fetchTideData(); // Pode rodar a consulta inicial se desejar
+    };
+
+</script>
+
 </body>
 </html>
+
