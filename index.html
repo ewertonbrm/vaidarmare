@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vai Dar Maré! (Natal/RN Fixo)</title>
+    <title>Vai Dar Maré! (Natal/RN Sem H1)</title>
     <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -36,7 +36,13 @@
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
-        <img src="vdmini.jpg">
+        
+        <!-- LOGO CENTRALIZADA E ELEVADA -->
+        <div class="flex justify-center -mt-4 mb-6">
+            <img src="vdmini.jpg" class="max-w-xs">
+        </div>
+        
+        <!-- O H1 "Vai dar Maré!" FOI REMOVIDO AQUI -->
         
         <!-- Formulário de Consulta -->
         <form id="tideForm" class="space-y-4">
@@ -98,15 +104,14 @@
         // Funções de Utilidade
         function showLoading(show) {
             submitBtn.disabled = show;
-            btnText.textContent = show ? 'Consultando...' : 'Consultar Marés';
+            btnText.textContent = show ? 'Consultando...' : 'Consultar';
             loadingSpinner.classList.toggle('hidden', !show);
-            // Nao esconde errorMessage aqui, ele eh resetado no fetchTideData
             tideList.classList.add('hidden');
             tideList.innerHTML = '';
         }
 
-        function showError(message) {
-            message.textContent = message;
+        function showError(msg) {
+            message.textContent = msg;
             resultsContainer.classList.remove('bg-gray-50', 'bg-green-100', 'border-green-400', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-red-100', 'border-red-400');
             tideList.classList.add('hidden');
@@ -128,8 +133,9 @@
 
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
+            // ATUALIZADO: Título com localização no cabeçalho da lista
             tideList.innerHTML = `
-                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Eventos de Maré</h2>
+                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Natal/RN - Eventos de Maré</h2>
             `;
             
             tideEvents.forEach(event => {
@@ -211,7 +217,7 @@
             } finally {
                 loadingSpinner.classList.add('hidden');
                 submitBtn.disabled = false;
-                btnText.textContent = 'Consultar Marés';
+                btnText.textContent = 'Consultar';
             }
         }
 
@@ -233,7 +239,4 @@
     </script>
 </body>
 </html>
-
-
-
 
