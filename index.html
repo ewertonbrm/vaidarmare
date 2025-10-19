@@ -77,7 +77,6 @@
 
     <script>
         const form = document.getElementById('tideForm');
-        // REMOVIDO: const locationIdInput = document.getElementById('locationId');
         const dateInput = document.getElementById('dateInput');
         const resultsContainer = document.getElementById('resultsContainer');
         const message = document.getElementById('message');
@@ -96,13 +95,28 @@
         const defaultDate = '2025-10-19'; 
         dateInput.value = defaultDate;
 
-        // Função utilitária para formatar a data (YYYYMMDD)
+        // Funções de Utilidade
+        function showLoading(show) {
+            submitBtn.disabled = show;
+            btnText.textContent = show ? 'Consultando...' : 'Consultar Marés';
+            loadingSpinner.classList.toggle('hidden', !show);
+            // Nao esconde errorMessage aqui, ele eh resetado no fetchTideData
+            tideList.classList.add('hidden');
+            tideList.innerHTML = '';
+        }
+
+        function showError(message) {
+            message.textContent = message;
+            resultsContainer.classList.remove('bg-gray-50', 'bg-green-100', 'border-green-400', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-red-100', 'border-red-400');
+            tideList.classList.add('hidden');
+        }
+
         const formatDate = (dateString) => {
             const [year, month, day] = dateString.split('-');
             return `${year}${month}${day}`;
         };
         
-        // Função utilitária para formatar a hora (HH:MM)
         const formatTime = (isoTime) => {
             try {
                 const date = new Date(isoTime);
@@ -141,18 +155,19 @@
 
             message.textContent = '';
             tideList.classList.remove('hidden');
-            resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100');
+            resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
             resultsContainer.classList.add('bg-green-100', 'border-green-400');
         };
 
         // Lógica da Consulta
-        async function fetchTideData(dateString) { // Remove o parâmetro locationId
+        async function fetchTideData(dateString) {
             const formattedDate = formatDate(dateString);
-            
-            // Usa o LOCATION_ID fixo na URL
             const url = `${API_BASE_URL}?location=${LOCATION_ID}&date=${formattedDate}`; 
 
             showLoading(true);
+            message.textContent = 'Buscando dados...';
+            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-green-100', 'border-green-400', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-gray-50', 'border-gray-200');
 
             try {
                 const response = await fetch(url);
@@ -160,11 +175,10 @@
 
                 if (!response.ok) {
                     let errorMessage = 'Ocorreu um erro desconhecido na comunicação.';
-                    let bgColor = 'bg-red-100';
-                    let borderColor = 'border-red-400';
-
                     if (response.status === 403) {
                         errorMessage = 'ERRO QWEATHER (Código 403): Chave Inválida ou Serviço de Marés não ativado.';
+                    } else if (response.status === 404) {
+                        errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
                     } else if (data.code && data.code !== '200') {
                         errorMessage = `Erro QWeather (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
                     } else if (data.error) {
@@ -173,8 +187,7 @@
                         errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
                     }
                     
-                    resultsContainer.classList.add(bgColor, borderColor);
-                    message.textContent = errorMessage;
+                    showError(errorMessage);
                     return;
                 }
                 
@@ -185,28 +198,21 @@
                         displayTideData(tideEvents);
                     } else {
                         message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data.';
+                        resultsContainer.classList.remove('bg-gray-50');
                         resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
                     }
                 } else {
-                    message.textContent = `Erro na Consulta: Código ${data.code}. ${data.msg || 'Detalhe não disponível.'}`;
-                    resultsContainer.classList.add('bg-red-100', 'border-red-400');
+                    showError(`Erro na Consulta: Código ${data.code}. ${data.msg || 'Detalhe não disponível.'}`);
                 }
 
             } catch (error) {
                 console.error('Erro de rede ou Serverless Function:', error);
-                message.textContent = `Erro de Comunicação: Verifique a sua conexão ou os logs do Vercel. Detalhe: ${error.message}`;
-                resultsContainer.classList.add('bg-red-100', 'border-red-400');
+                showError(`Erro de Comunicação: Verifique a sua conexão ou os logs do Vercel. Detalhe: ${error.message}`);
             } finally {
-                showLoading(false);
+                loadingSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+                btnText.textContent = 'Consultar Marés';
             }
-        }
-
-        function showLoading(show) {
-            queryButton.disabled = show;
-            queryButton.textContent = show ? 'Consultando...' : 'Consultar Marés';
-            loadingMessage.classList.toggle('hidden', !show);
-            errorMessage.classList.add('hidden');
-            tideList.innerHTML = '';
         }
 
 
@@ -216,13 +222,12 @@
             const dateString = dateInput.value;
             
             if (dateString) {
-                fetchTideData(dateString); // Chama com a data, usando LOCATION_ID fixo
+                fetchTideData(dateString); 
             }
         });
 
         // Inicialização 
         window.onload = () => {
-            // Define a data de teste inicial (2025-10-19)
             dateInput.value = "2025-10-19";
         };
     </script>
