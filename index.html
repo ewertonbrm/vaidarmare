@@ -59,13 +59,6 @@
             </button>
         </form>
 
-        <!-- Novo campo para exibir o endereço da API -->
-        <div class="mt-4">
-            
-            <input type="text" id="apiUrlDisplay" readonly value="A URL completa aparecerá após a primeira consulta."
-                   class="mt-1 block w-full px-4 py-1 text-xs border border-gray-200 rounded-md bg-gray-100 text-gray-600 cursor-default">
-        </div>
-
         <!-- Área de Resultados e Mensagens -->
         <div id="resultsContainer" class="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
             <p id="message" class="text-gray-500 text-center">Insira a localização e a data para consultar a tábua de marés.</p>
@@ -93,10 +86,6 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
-        const apiUrlDisplayInput = document.getElementById('apiUrlDisplay');
-
-        // CRÍTICO: Domínio base da API da QWeather, copiado da função Serverless.
-        const QWEATHER_EXTERNAL_BASE_URL = 'https://ky33jp8fv5.re.qweatherapi.com/v7/ocean/tide';
 
         // Define a data padrão como 2025-10-19, conforme o exemplo funcional
         const today = new Date();
@@ -113,9 +102,14 @@
         };
         
         // Função utilitária para formatar a hora (HH:MM)
-        const formatTime = (time) => {
-            // Remove o fuso horário se estiver presente (e.g., "16:11+08")
-            return time.split('+')[0];
+        const formatTime = (isoTime) => {
+            try {
+                // Remove o fuso horário se estiver presente (e.g., "2025-10-19T02:29-03:00")
+                const date = new Date(isoTime);
+                return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            } catch (e) {
+                return 'N/A';
+            }
         };
 
         // Função principal para buscar os dados
@@ -123,10 +117,6 @@
             const formattedDate = formatDate(dateString);
             const url = `${API_BASE_URL}?location=${locationId}&date=${formattedDate}`; // URL Vercel Proxy
 
-            // 1. CONSTRÓI E EXIBE A URL EXTERNA COMPLETA (SEM A CHAVE SECRETA)
-            const externalDisplayUrl = `${QWEATHER_EXTERNAL_BASE_URL}?location=${locationId}&date=${formattedDate}&key=[CHAVE SECRETA OCULTA NO SERVIDOR]`;
-            apiUrlDisplayInput.value = externalDisplayUrl;
-            
             // Resetar UI
             tideList.classList.add('hidden');
             tideList.innerHTML = '';
@@ -151,10 +141,8 @@
                     } else if (response.status === 404) {
                         errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
                     } else if (data.code) {
-                        // Trata erros específicos da API QWeather, como 400
                          errorMessage = `Erro na API QWEATHER (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
                     } else if (data.error) {
-                        // Trata erros da Serverless Function (ex: erro 500)
                         errorMessage = `Erro do Servidor (500): ${data.error}`;
                     } else {
                         errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
@@ -170,7 +158,6 @@
                 
                 // A QWeather usa o código '200' para sucesso
                 if (data.code === '200') {
-                    // *** CORREÇÃO CRÍTICA: MUDAR data.tide PARA data.tideTable ***
                     const tideEvents = data.tideTable; 
 
                     if (tideEvents && tideEvents.length > 0) {
@@ -181,7 +168,7 @@
                         resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
                     }
                 } else {
-                    // Trata códigos de erro dentro do corpo da resposta JSON (ex: QWeather codes)
+                    // Trata códigos de erro dentro do corpo da resposta JSON
                     message.textContent = `Erro na Consulta: Código ${data.code}. ${data.msg || 'Detalhe não disponível.'}`;
                     resultsContainer.classList.add('bg-red-100', 'border-red-400');
                 }
@@ -205,7 +192,6 @@
             `;
             
             tideEvents.forEach(event => {
-                // *** CORREÇÃO CRÍTICA: MUDAR event.type === '0' PARA event.type === 'H' ***
                 const isHighTide = event.type === 'H'; 
                 const icon = isHighTide ? '▲' : '▼';
                 const color = isHighTide ? 'text-blue-600' : 'text-green-600';
@@ -242,9 +228,7 @@
                 fetchTideData(locationId, dateString);
             }
         });
-
-        // Inicializa o campo de exibição da URL
-        apiUrlDisplayInput.value = `${QWEATHER_EXTERNAL_BASE_URL}?location=[ID]&date=[YYYYMMDD]&key=[CHAVE SECRETA OCULTA]`;
     </script>
 </body>
 </html>
+
