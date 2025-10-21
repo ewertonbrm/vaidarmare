@@ -1,9 +1,13 @@
+Entendi. Mais uma vez, mil desculpas pela falha de exibição. Vou colocar o código diretamente no corpo da resposta para que você consiga copiar o conteúdo completo e correto com o título cursivo.
+Aqui está o código do seu index.html com o título "Vai Dar Maré!" em fonte cursiva, azul escuro e expressiva, logo abaixo da logo:
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vai Dar Maré! (Natal/RN Sem H1)</title>
+    <title>Vai Dar Maré! (Título Cursivo)</title>
+    <!-- Carrega a fonte cursiva Caveat do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
     <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -18,6 +22,10 @@
             backdrop-filter: blur(10px);
             background-color: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(229, 231, 235, 0.6);
+        }
+        /* CLASSE CURSIVA EXPRESSIVA */
+        .cursive-title {
+            font-family: 'Caveat', cursive;
         }
     </style>
     <!-- Inicia o Tailwind com a fonte Inter -->
@@ -37,18 +45,22 @@
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
-        <!-- LOGO CENTRALIZADA E ELEVADA -->
-        <div class="flex justify-center -mt-4 mb-6">
+        <!-- LOGO E TÍTULO CURSIVO CENTRALIZADOS -->
+        <div class="flex flex-col items-center -mt-4 mb-4">
             <img src="vaida192.png" class="max-w-xs">
+            <!-- NOVO TÍTULO CURSIVO E EXPRESSIVO -->
+            <h2 class="cursive-title text-5xl font-extrabold text-blue-900 mt-2">
+                Vai Dar Maré!
+            </h2>
         </div>
-        
-        <!-- O H1 "Vai dar Maré!" FOI REMOVIDO AQUI -->
         
         <!-- Formulário de Consulta -->
         <form id="tideForm" class="space-y-4">
             
             <!-- Campo de Localização Fixa -->
-            
+            <p class="text-sm font-medium text-gray-700 text-center py-2 border border-blue-100 bg-blue-50 rounded-md">
+                Tábua das Marés de Natal/RN.
+            </p>
 
             <div>
                 <label for="dateInput" class="block text-sm font-medium text-gray-700">Data</label>
@@ -131,7 +143,7 @@
 
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
-            // ATUALIZADO: Título com localização no cabeçalho da lista
+            // Título com localização no cabeçalho da lista
             tideList.innerHTML = `
                 <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Natal/RN - Eventos de Maré</h2>
             `;
@@ -237,6 +249,4 @@
     </script>
 </body>
 </html>
-
-
 
