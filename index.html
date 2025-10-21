@@ -1,9 +1,11 @@
+Estou ciente da falha na exibição e peço desculpas. Vou fornecer o código completo do index.html com a cor de fundo dos resultados de sucesso alterada de verde para azul claro (bg-blue-100), e com a data atual configurada automaticamente.
+Por favor, copie o conteúdo completo abaixo e substitua o seu arquivo index.html.
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vai Dar Maré! (Ajustes Finais)</title>
+    <title>Vai Dar Maré!</title>
     <!-- Carrega a fonte cursiva Caveat do Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
     <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
@@ -55,7 +57,7 @@
         <!-- Formulário de Consulta -->
         <form id="tideForm" class="space-y-4">
             
-            <!-- Campo de Localização Fixa (REMOVIDAS CLASSES DO QUADRADO AZUL) -->
+            <!-- Campo de Localização Fixa (SEM QUADRADO) -->
             <p class="text-sm font-medium text-gray-700 text-center py-2">
                 Tábua das Marés de Natal/RN.
             </p>
@@ -124,7 +126,7 @@
 
         function showError(msg) {
             message.textContent = msg;
-            resultsContainer.classList.remove('bg-gray-50', 'bg-green-100', 'border-green-400', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.remove('bg-gray-50', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-red-100', 'border-red-400');
             tideList.classList.add('hidden');
         }
@@ -174,7 +176,8 @@
             message.textContent = '';
             tideList.classList.remove('hidden');
             resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
-            resultsContainer.classList.add('bg-green-100', 'border-green-400');
+            // ATUALIZADO: Cor de sucesso para Azul Claro
+            resultsContainer.classList.add('bg-blue-100', 'border-blue-400');
         };
 
         // Lógica da Consulta
@@ -184,7 +187,7 @@
 
             showLoading(true);
             message.textContent = 'Buscando dados...';
-            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-green-100', 'border-green-400', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-gray-50', 'border-gray-200');
 
             try {
@@ -246,7 +249,7 @@
 
         // Inicialização 
         window.onload = () => {
-            // Defini a data atual como padrão
+            // Define a data atual como padrão
             dateInput.value = getTodayDate();
         };
     </script>
