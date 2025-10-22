@@ -1,9 +1,12 @@
+Mais uma vez, peço imensas desculpas por essa falha constante na exibição do código HTML. Isso não deveria acontecer.
+Aqui está o código completo do index.html com a lógica de Recomendação de Mergulho e os ajustes estéticos finais, entregue diretamente no corpo da resposta para garantir que você o receba.
+Por favor, copie o conteúdo COMPLETO abaixo e substitua o seu arquivo index.html.
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vai Dar Maré!</title>
+    <title>Vai Dar Maré! (Recomendação de Mergulho)</title>
     <!-- Carrega a fonte cursiva Caveat do Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
     <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
@@ -23,7 +26,7 @@
         }
         /* CLASSE CURSIVA EXPRESSIVA */
         .cursive-title {
-            font-family: 'Moonlight', cursive;
+            font-family: 'Caveat', cursive;
         }
     </style>
     <!-- Inicia o Tailwind com a fonte Inter -->
@@ -143,38 +146,80 @@
             }
         };
 
+        // NOVO: Calcula o ponto médio entre duas datas ISO
+        function calculateMidpointTime(isoTime1, isoTime2) {
+            try {
+                const time1 = new Date(isoTime1).getTime();
+                const time2 = new Date(isoTime2).getTime();
+                const midpoint = new Date((time1 + time2) / 2);
+                
+                // Formata o ponto médio para HH:MM
+                return midpoint.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            } catch (e) {
+                return null;
+            }
+        }
+
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
             // Título com localização no cabeçalho da lista
-            tideList.innerHTML = `
+            let resultsHtml = `
                 <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Natal/RN - Eventos de Maré</h2>
             `;
             
+            // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
+            let idealDiveHtml = '';
+            
+            if (tideEvents.length >= 3) {
+                // Cálculo 1: Média entre o 1º e o 2º evento
+                const diveTime1 = calculateMidpointTime(tideEvents[0].fxTime, tideEvents[1].fxTime);
+                
+                // Cálculo 2: Média entre o 2º e o 3º evento
+                const diveTime2 = calculateMidpointTime(tideEvents[1].fxTime, tideEvents[2].fxTime);
+
+                if (diveTime1 && diveTime2) {
+                    idealDiveHtml = `
+                        <p class="text-sm font-bold text-center text-blue-700 p-2 mt-4 rounded-md bg-yellow-100 border border-yellow-300">
+                            🌊 Mergulho/Maré Morta ideal entre <span class="text-lg font-extrabold">${diveTime1}</span> e <span class="text-lg font-extrabold">${diveTime2}</span>!
+                        </p>
+                    `;
+                }
+            }
+            
+            // Adiciona a recomendação de mergulho após o cabeçalho
+            resultsHtml += idealDiveHtml;
+
+            // Inicia a lista de marés
+            resultsHtml += `<div class="w-full mt-4 space-y-3">`;
+
             tideEvents.forEach(event => {
                 const isHighTide = event.type === 'H'; 
                 const icon = isHighTide ? '▲' : '▼';
                 const color = isHighTide ? 'text-blue-600' : 'text-green-600';
                 const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
 
-                const listItem = document.createElement('div');
-                listItem.className = `flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${isHighTide ? 'border-blue-200' : 'border-green-200'}`;
-                listItem.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-xl font-bold ${color}">${icon}</span>
-                        <div>
-                            <p class="font-medium text-gray-900">${label}</p>
-                            <p class="text-xs text-gray-500">Altura: ${event.height}m</p>
+                resultsHtml += `
+                    <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${isHighTide ? 'border-blue-200' : 'border-green-200'}">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl font-bold ${color}">${icon}</span>
+                            <div>
+                                <p class="font-medium text-gray-900">${label}</p>
+                                <p class="text-xs text-gray-500">Altura: ${event.height}m</p>
+                            </div>
                         </div>
+                        <span class="text-lg font-bold text-gray-700">${formatTime(event.fxTime)}</span>
                     </div>
-                    <span class="text-lg font-bold text-gray-700">${formatTime(event.fxTime)}</span>
                 `;
-                tideList.appendChild(listItem);
             });
+
+            resultsHtml += `</div>`; // Fecha a div da lista
+
+            tideList.innerHTML = resultsHtml; // Injeta o HTML completo
 
             message.textContent = '';
             tideList.classList.remove('hidden');
             resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
-            // ATUALIZADO: Cor de sucesso para Azul Claro
+            // Cor de sucesso para Azul Claro
             resultsContainer.classList.add('bg-blue-100', 'border-blue-400');
         };
 
@@ -253,6 +298,4 @@
     </script>
 </body>
 </html>
-
-
 
