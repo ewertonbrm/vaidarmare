@@ -156,7 +156,7 @@
             // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
             let idealDiveHtml = '';
             
-            if (tideEvents.length >= 3) {
+            if (tideEvents.length >= 3) { // A mensagem só é gerada se houver 3 ou mais eventos de maré
                 // Cálculo 1: Média entre o 1º e o 2º evento
                 const diveTime1 = calculateMidpointTime(tideEvents[0].fxTime, tideEvents[1].fxTime);
                 
@@ -174,7 +174,6 @@
             
             // Adiciona a recomendação de mergulho
             resultsHtml += idealDiveHtml; // CORREÇÃO: Adiciona a recomendação ao HTML
-            // Linha anterior (idealDiveHtml;) removida.
 
             // Inicia a lista de marés
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
