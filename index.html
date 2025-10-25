@@ -37,7 +37,8 @@
             }
         }
     </script>
-</head><body class="min-h-screen flex items-start justify-center pt-8 pb-4 px-4">
+</head>
+<body class="min-h-screen flex items-start justify-center pt-8 pb-4 px-4">
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
@@ -150,12 +151,14 @@
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
             // Título com localização no cabeçalho da lista
-            let resultsHtml = ''; 
+            let resultsHtml = `
+                
+            `;
             
             // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
             let idealDiveHtml = '';
             
-            if (tideEvents.length >= 3) { 
+            if (tideEvents.length >= 3) {
                 // Cálculo 1: Média entre o 1º e o 2º evento
                 const diveTime1 = calculateMidpointTime(tideEvents[0].fxTime, tideEvents[1].fxTime);
                 
@@ -163,23 +166,22 @@
                 const diveTime2 = calculateMidpointTime(tideEvents[1].fxTime, tideEvents[2].fxTime);
 
                 if (diveTime1 && diveTime2) {
+                    // Note que as classes 'mt-4' e 'mb-4' estão na div da lista de marés. 
+                    // Aqui removemos o 'mt-4' do <p> para que ele fique colado ao topo do container.
                     idealDiveHtml = `
-                        <p class="text-sm font-bold text-center text-blue-700 p-2 rounded-md bg-yellow-100 border border-yellow-300">
+                        <p class="text-sm font-bold text-center text-blue-700 p-3 rounded-lg bg-yellow-100 border border-yellow-300 w-full">
                             🌊 O melhor horário para tomar banho de mar será entre ${diveTime1} e ${diveTime2}.
                         </p>
                     `;
                 }
             }
             
-            // Adiciona a recomendação de mergulho
-            resultsHtml += idealDiveHtml;
+            // CORREÇÃO APLICADA AQUI: Adiciona a recomendação de mergulho, se calculada, ao resultsHtml.
+            resultsHtml += idealDiveHtml; 
 
-            // Define a margem superior da lista de marés: 
-            // Adiciona 'mt-3' (uma pequena margem) se houver recomendação, 
-            // senão, usa 'mt-4' para afastar do topo (caso não haja mensagem).
-            const listMargin = idealDiveHtml ? 'mt-3' : 'mt-0'; 
-
-            resultsHtml += `<div class="w-full ${listMargin} space-y-3">`;
+            // Inicia a div da lista de marés (que conterá a lista de eventos)
+            // Note que aqui eu adicionei 'mt-4' para criar o espaço entre a mensagem de banho e a primeira maré.
+            resultsHtml += `<div class="w-full ${idealDiveHtml ? 'mt-4' : ''} space-y-3">`;
 
             tideEvents.forEach(event => {
                 const isHighTide = event.type === 'H'; 
@@ -201,12 +203,21 @@
                 `;
             });
 
-            resultsHtml += `</div>`; // Fecha a div da lista
+            resultsHtml += `</div>`; // Fecha a div da lista de marés
 
             tideList.innerHTML = resultsHtml; // Injeta o HTML completo
 
             message.textContent = '';
-            tideList.classList.remove('hidden');
+            // Esconde o <p> de "Insira a data..."
+            message.classList.add('hidden'); 
+            
+            // Oculta/mostra a lista baseada se houve dados injetados
+            if (resultsHtml.trim() !== '') {
+                 tideList.classList.remove('hidden');
+            } else {
+                 tideList.classList.add('hidden');
+            }
+            
             resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
             // Cor de sucesso para Azul Claro
             resultsContainer.classList.add('bg-blue-100', 'border-blue-400');
@@ -219,6 +230,8 @@
 
             showLoading(true);
             message.textContent = 'Buscando dados...';
+            // Garante que o <p> de mensagem aparece durante o loading
+            message.classList.remove('hidden'); 
             resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-gray-50', 'border-gray-200');
 
@@ -251,7 +264,9 @@
                         displayTideData(tideEvents);
                     } else {
                         message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data.';
-                        resultsContainer.classList.remove('bg-gray-50');
+                        message.classList.remove('hidden');
+                        tideList.classList.add('hidden');
+                        resultsContainer.classList.remove('bg-gray-50', 'bg-blue-100', 'border-blue-400');
                         resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
                     }
                 } else {
