@@ -30,6 +30,10 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    colors: {
+                        'page-bg': '#004D66', // Cor do fundo da página, usada no botão
+                        'title-color': '#214469', // Nova cor para o título
+                    },
                     fontFamily: {
                         sans: ['Roboto', 'sans-serif'],
                     },
@@ -44,7 +48,7 @@
         
         <div class="flex flex-col items-center -mt-4 mb-4">
             <img src="vaida192.png" class="max-w-xs">
-            <h2 class="cursive-title text-4xl font-extrabold text-blue-900 mt-2">
+            <h2 class="cursive-title text-4xl font-extrabold text-title-color mt-2">
                 Vai Dar Maré!
             </h2>
         </div>
@@ -62,7 +66,7 @@
             </div>
 
             <button type="submit" id="submitBtn" 
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-[1.01]">
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-page-bg hover:bg-page-bg/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-page-bg transition duration-300 ease-in-out transform hover:scale-[1.01]">
                 <span id="btnText">Consultar</span>
             </button>
         </form>
@@ -115,6 +119,7 @@
 
         function showError(msg) {
             message.textContent = msg;
+            message.classList.remove('hidden'); 
             resultsContainer.classList.remove('bg-gray-50', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-red-100', 'border-red-400');
             tideList.classList.add('hidden');
@@ -166,8 +171,6 @@
                 const diveTime2 = calculateMidpointTime(tideEvents[1].fxTime, tideEvents[2].fxTime);
 
                 if (diveTime1 && diveTime2) {
-                    // Note que as classes 'mt-4' e 'mb-4' estão na div da lista de marés. 
-                    // Aqui removemos o 'mt-4' do <p> para que ele fique colado ao topo do container.
                     idealDiveHtml = `
                         <p class="text-sm font-bold text-center text-blue-700 p-3 rounded-lg bg-yellow-100 border border-yellow-300 w-full">
                             🌊 O melhor horário para tomar banho de mar será entre ${diveTime1} e ${diveTime2}.
@@ -176,11 +179,10 @@
                 }
             }
             
-            // CORREÇÃO APLICADA AQUI: Adiciona a recomendação de mergulho, se calculada, ao resultsHtml.
+            // Adiciona a recomendação de mergulho, se calculada, ao resultsHtml.
             resultsHtml += idealDiveHtml; 
 
             // Inicia a div da lista de marés (que conterá a lista de eventos)
-            // Note que aqui eu adicionei 'mt-4' para criar o espaço entre a mensagem de banho e a primeira maré.
             resultsHtml += `<div class="w-full ${idealDiveHtml ? 'mt-4' : ''} space-y-3">`;
 
             tideEvents.forEach(event => {
