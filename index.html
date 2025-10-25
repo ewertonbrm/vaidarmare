@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vai Dar Maré!</title>
-    <!-- Carrega a fonte cursiva Caveat do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
-    <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Define a fonte Inter como padrão */
@@ -28,7 +26,6 @@
             font-family: 'Playwrite DE SAS', cursive;
         }
     </style>
-    <!-- Inicia o Tailwind com a fonte Inter -->
     <script>
         tailwind.config = {
             theme: {
@@ -45,19 +42,15 @@
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
-        <!-- LOGO E TÍTULO CURSIVO CENTRALIZADOS -->
         <div class="flex flex-col items-center -mt-4 mb-4">
             <img src="vaida192.png" class="max-w-xs">
-            <!-- TÍTULO CURSIVO E EXPRESSIVO -->
             <h2 class="cursive-title text-4xl font-extrabold text-blue-900 mt-2">
                 Vai Dar Maré!
             </h2>
         </div>
         
-        <!-- Formulário de Consulta -->
         <form id="tideForm" class="space-y-4">
             
-            <!-- Campo de Localização Fixa (SEM QUADRADO) -->
             <p class="text-sm font-medium text-gray-700 text-center py-2">
                 Tábua das Marés de Natal/RN
             </p>
@@ -74,20 +67,16 @@
             </button>
         </form>
 
-        <!-- Área de Resultados e Mensagens -->
         <div id="resultsContainer" class="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
             <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua de marés.</p>
             <div id="tideList" class="w-full mt-4 space-y-3 hidden">
-                <!-- Resultados da API serão injetados aqui -->
-            </div>
-            <!-- Ícone de Carregamento (Hidden by default) -->
+                </div>
             <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-blue-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </div>
         
-        <!-- Créditos e Informações de Debug -->
         <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela QWeather. Integração via Vercel Serverless Function.</p>
     </div>
 
@@ -162,9 +151,7 @@
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
             // Título com localização no cabeçalho da lista
-            let resultsHtml = `
-                
-            `;
+            let resultsHtml = ''; // CORREÇÃO: Inicializa como string vazia para remover o espaço
             
             // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
             let idealDiveHtml = '';
@@ -185,8 +172,9 @@
                 }
             }
             
-            // Adiciona a recomendação de mergulho após o cabeçalho
-            idealDiveHtml;
+            // Adiciona a recomendação de mergulho
+            resultsHtml += idealDiveHtml; // CORREÇÃO: Adiciona a recomendação ao HTML
+            // Linha anterior (idealDiveHtml;) removida.
 
             // Inicia a lista de marés
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
@@ -297,9 +285,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
