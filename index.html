@@ -6,12 +6,13 @@
     <title>Vai Dar Maré!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Define a fonte Inter como padrão */
+        /* Define a fonte Oswald como padrão para o body, exceto onde 'cursive-title' é aplicado */
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Oswald', sans-serif;
             background-color: #004D66; /* light blue-gray background */
         }
         /* Estilos adicionais para botões e cards */
@@ -35,7 +36,8 @@
                         'title-color': '#214469', // Nova cor para o título
                     },
                     fontFamily: {
-                        sans: ['Roboto', 'sans-serif'],
+                        // Define 'Oswald' como a fonte sans padrão do Tailwind
+                        sans: ['Oswald', 'sans-serif'],
                     },
                 }
             }
