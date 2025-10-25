@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vai Dar Maré!</title>
+    <!-- Carrega a fonte cursiva Caveat do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
+    <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Define a fonte Inter como padrão */
@@ -30,6 +32,7 @@ k
             font-family: 'Playwrite DE SAS', cursive
         }
     </style>
+    <!-- Inicia o Tailwind com a fonte Inter -->
     <script>
         tailwind.config = {
             theme: {
@@ -37,11 +40,6 @@ k
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     },
-                    colors: {
-                        'main-blue': '#004D66', // Cor do fundo
-                        'result-bg': '#E6F3F7', // Azul bem claro, harmonizando com o fundo principal
-                        'result-border': '#99C7D3', // Borda sutil
-                    }
                 }
             }
         }
@@ -51,15 +49,19 @@ k
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
+        <!-- LOGO E TÍTULO CURSIVO CENTRALIZADOS -->
         <div class="flex flex-col items-center -mt-4 mb-4">
             <img src="vaida192.png" class="max-w-xs">
-            <h2 class="cursive-title text-3xl font-extrabold text-[#23466E] mt-2">
+            <!-- TÍTULO CURSIVO E EXPRESSIVO -->
+            <h2 class="cursive-title text-5xl font-extrabold text-blue-900 mt-2">
                 Vai Dar Maré!
             </h2>
         </div>
         
+        <!-- Formulário de Consulta -->
         <form id="tideForm" class="space-y-4">
             
+            <!-- Campo de Localização Fixa (SEM QUADRADO) -->
             <p class="text-sm font-medium text-gray-700 text-center py-2">
                 Tábua das Marés de Natal/RN
             </p>
@@ -71,21 +73,25 @@ k
             </div>
 
             <button type="submit" id="submitBtn" 
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-main-blue hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-blue transition duration-300 ease-in-out transform hover:scale-[1.01]">
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-[1.01]">
                 <span id="btnText">Consultar</span>
             </button>
         </form>
 
+        <!-- Área de Resultados e Mensagens -->
         <div id="resultsContainer" class="mt-6 p-4 rounded-lg bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
             <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua de marés.</p>
             <div id="tideList" class="w-full mt-4 space-y-3 hidden">
-                </div>
-            <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-main-blue hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <!-- Resultados da API serão injetados aqui -->
+            </div>
+            <!-- Ícone de Carregamento (Hidden by default) -->
+            <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-blue-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </div>
         
+        <!-- Créditos e Informações de Debug -->
         <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela QWeather. Integração via Vercel Serverless Function.</p>
     </div>
 
@@ -119,4 +125,188 @@ k
             btnText.textContent = show ? 'Consultando...' : 'Consultar';
             loadingSpinner.classList.toggle('hidden', !show);
             tideList.classList.add('hidden');
-            tideList.innerHTML =
+            tideList.innerHTML = '';
+        }
+
+        function showError(msg) {
+            message.textContent = msg;
+            resultsContainer.classList.remove('bg-gray-50', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-red-100', 'border-red-400');
+            tideList.classList.add('hidden');
+        }
+
+        const formatDate = (dateString) => {
+            const [year, month, day] = dateString.split('-');
+            return `${year}${month}${day}`;
+        };
+        
+        const formatTime = (isoTime) => {
+            try {
+                const date = new Date(isoTime);
+                return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            } catch (e) {
+                return 'N/A';
+            }
+        };
+
+        // NOVO: Calcula o ponto médio entre duas datas ISO
+        function calculateMidpointTime(isoTime1, isoTime2) {
+            try {
+                const time1 = new Date(isoTime1).getTime();
+                const time2 = new Date(isoTime2).getTime();
+                const midpoint = new Date((time1 + time2) / 2);
+                
+                // Formata o ponto médio para HH:MM
+                return midpoint.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Função para exibir os dados na lista
+        const displayTideData = (tideEvents) => {
+            // Título com localização no cabeçalho da lista
+            let resultsHtml = `
+                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Natal/RN - Eventos de Maré</h2>
+            `;
+            
+            // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
+            let idealDiveHtml = '';
+            
+            if (tideEvents.length >= 3) {
+                // Cálculo 1: Média entre o 1º e o 2º evento
+                const diveTime1 = calculateMidpointTime(tideEvents[0].fxTime, tideEvents[1].fxTime);
+                
+                // Cálculo 2: Média entre o 2º e o 3º evento
+                const diveTime2 = calculateMidpointTime(tideEvents[1].fxTime, tideEvents[2].fxTime);
+
+                if (diveTime1 && diveTime2) {
+                    idealDiveHtml = `
+                        <p class="text-sm font-bold text-center text-blue-700 p-2 mt-4 rounded-md bg-yellow-100 border border-yellow-300">
+                            🌊 O melhor horário para tomar banho de mar será entre ${diveTime1} e ${diveTime2}.
+                        </p>
+                    `;
+                }
+            }
+            
+            // Adiciona a recomendação de mergulho após o cabeçalho
+            resultsHtml += idealDiveHtml;
+
+            // Inicia a lista de marés
+            resultsHtml += `<div class="w-full mt-4 space-y-3">`;
+
+            tideEvents.forEach(event => {
+                const isHighTide = event.type === 'H'; 
+                const icon = isHighTide ? '▲' : '▼';
+                const color = isHighTide ? 'text-blue-600' : 'text-green-600';
+                const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
+
+                resultsHtml += `
+                    <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${isHighTide ? 'border-blue-200' : 'border-green-200'}">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl font-bold ${color}">${icon}</span>
+                            <div>
+                                <p class="font-medium text-gray-900">${label}</p>
+                                <p class="text-xs text-gray-500">Altura: ${event.height}m</p>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold text-gray-700">${formatTime(event.fxTime)}</span>
+                    </div>
+                `;
+            });
+
+            resultsHtml += `</div>`; // Fecha a div da lista
+
+            tideList.innerHTML = resultsHtml; // Injeta o HTML completo
+
+            message.textContent = '';
+            tideList.classList.remove('hidden');
+            resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
+            // Cor de sucesso para Azul Claro
+            resultsContainer.classList.add('bg-blue-100', 'border-blue-400');
+        };
+
+        // Lógica da Consulta
+        async function fetchTideData(dateString) {
+            const formattedDate = formatDate(dateString);
+            const url = `${API_BASE_URL}?location=${LOCATION_ID}&date=${formattedDate}`; 
+
+            showLoading(true);
+            message.textContent = 'Buscando dados...';
+            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-gray-50', 'border-gray-200');
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    let errorMessage = 'Ocorreu um erro desconhecido na comunicação.';
+                    if (response.status === 403) {
+                        errorMessage = 'ERRO QWEATHER (Código 403): Chave Inválida ou Serviço de Marés não ativado.';
+                    } else if (response.status === 404) {
+                        errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
+                    } else if (data.code && data.code !== '200') {
+                        errorMessage = `Erro QWeather (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
+                    } else if (data.error) {
+                        errorMessage = `Erro do Servidor (500): ${data.error}`;
+                    } else {
+                        errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
+                    }
+                    
+                    showError(errorMessage);
+                    return;
+                }
+                
+                if (data.code === '200') {
+                    const tideEvents = data.tideTable; 
+
+                    if (tideEvents && tideEvents.length > 0) {
+                        displayTideData(tideEvents);
+                    } else {
+                        message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data.';
+                        resultsContainer.classList.remove('bg-gray-50');
+                        resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
+                    }
+                } else {
+                    showError(`Erro na Consulta: Código ${data.code}. ${data.msg || 'Detalhe não disponível.'}`);
+                }
+
+            } catch (error) {
+                console.error('Erro de rede ou Serverless Function:', error);
+                showError(`Erro de Comunicação: Verifique a sua conexão ou os logs do Vercel. Detalhe: ${error.message}`);
+            } finally {
+                loadingSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+                btnText.textContent = 'Consultar';
+            }
+        }
+
+
+        // Listener do Formulário
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dateString = dateInput.value;
+            
+            if (dateString) {
+                fetchTideData(dateString); 
+            }
+        });
+
+        // Inicialização 
+        window.onload = () => {
+            // Define a data atual como padrão
+            dateInput.value = getTodayDate();
+        };
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
