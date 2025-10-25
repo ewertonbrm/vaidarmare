@@ -70,7 +70,8 @@
                 <span id="btnText">Consultar</span>
             </button>
         </form>
-<div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
+
+        <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
 
             <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua.</p>
             <div id="tideList" class="w-full mt-4 space-y-3 hidden">
@@ -139,51 +140,20 @@
             }
         };
 
-        // NOVO: Calcula o ponto médio entre duas datas ISO
-        function calculateMidpointTime(isoTime1, isoTime2) {
-            try {
-                const time1 = new Date(isoTime1).getTime();
-                const time2 = new Date(isoTime2).getTime();
-                const midpoint = new Date((time1 + time2) / 2);
-                
-                // Formata o ponto médio para HH:MM
-                return midpoint.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
-            } catch (e) {
-                return null;
-            }
-        }
+        // NOTA: A função calculateMidpointTime foi removida
+        // NOTA: O código que dependia de calculateMidpointTime também foi removido
 
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
-            // Título com localização no cabeçalho da lista
-            let resultsHtml = `
-                
-            `;
             
-            // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
-            let idealDiveHtml = '';
+            let resultsHtml = ``;
             
-            if (tideEvents.length >= 3) {
-                // Cálculo 1: Média entre o 1º e o 2º evento
-                const diveTime1 = calculateMidpointTime(tideEvents[0].fxTime, tideEvents[1].fxTime);
-                
-                // Cálculo 2: Média entre o 2º e o 3º evento
-                const diveTime2 = calculateMidpointTime(tideEvents[1].fxTime, tideEvents[2].fxTime);
+            // NOTA: O bloco de cálculo e geração do idealDiveHtml foi removido
 
-                if (diveTime1 && diveTime2) {
-                    idealDiveHtml = `
-                        <p class="text-sm font-bold text-center text-blue-700 p-3 rounded-lg bg-yellow-100 border border-yellow-300 w-full">
-                            🌊 O melhor horário para tomar banho de mar será entre ${diveTime1} e ${diveTime2}.
-                        </p>
-                    `;
-                }
-            }
-            
-            // Adiciona a recomendação de mergulho, se calculada, ao resultsHtml.
-            resultsHtml += idealDiveHtml; 
-
-            // Inicia a div da lista de marés (que conterá a lista de eventos)
-            resultsHtml += `<div class="w-full ${idealDiveHtml ? 'mt-4' : ''} space-y-3">`;
+            // Inicia a div da lista de marés (agora sem a condição 'idealDiveHtml ? mt-4 : ''')
+            resultsHtml += `<div class="w-full mt-0 space-y-3">`; 
+            // O 'mt-0' aqui garante que a primeira maré comece no topo da lista. Se quiser um pequeno espaço (padrão de 1rem), use 'mt-4'.
+            // Mantive 'mt-0' para aderir ao design sem o aviso de mergulho.
 
             tideEvents.forEach(event => {
                 const isHighTide = event.type === 'H'; 
