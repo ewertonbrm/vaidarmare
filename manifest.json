@@ -1,8 +1,8 @@
 
 {
     "name": "Vai Dar Maré!",
-    "short_name": "Marés RN",
-    "description": "Tábua das marés de Natal/RN. Funciona offline (leitura shell).",
+    "short_name": "Vai Dar Maré!",
+    "description": "Tábua das marés de Natal/RN.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#003399",
@@ -20,3 +20,4 @@
         }
     ]
 }
+
