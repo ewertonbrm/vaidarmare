@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vai Dar Maré!</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#004D66">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
@@ -273,6 +277,20 @@
             // Define a data atual como padrão
             dateInput.value = getTodayDate();
         };
+
+        // NOVO: Registro do Service Worker para o PWA (Adicionar à Tela Inicial/Offline)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Registra o service-worker.js no escopo raiz './'
+                navigator.serviceWorker.register('service-worker.js', { scope: './' })
+                    .then(registration => {
+                        console.log('Service Worker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Falha no registro do Service Worker:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
