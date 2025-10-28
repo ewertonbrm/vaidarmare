@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -52,7 +51,8 @@
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
-        <div class="flex flex-col items-center -mt-4 mb-4">
+        <!-- MARGEM ACIMA DA LOGO: -mt-4 foi alterado para mt-4, e pt-8 no body controla o topo -->
+        <div class="flex flex-col items-center mt-4 mb-4">
             <img src="vaida192.png" class="w-32 md:w-40">
 
             <h2 class="cursive-title text-4xl font-extrabold text-title-color mt-2">
@@ -161,18 +161,8 @@
             }
         };
 
-        function calculateMidpointTime(isoTime1, isoTime2) {
-            try {
-                const time1 = new Date(isoTime1).getTime();
-                const time2 = new Date(isoTime2).getTime();
-                const midpoint = new Date((time1 + time2) / 2);
-                
-                return midpoint.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
-            } catch (e) {
-                return null;
-            }
-        }
-
+        // NOTA: A função calculateMidpointTime foi removida
+        
         // Função para exibir os dados na lista
         const displayTideData = (tideEvents) => {
             
@@ -180,23 +170,8 @@
                 <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Natal/RN - Eventos de Maré</h2>
             `;
             
-            // --- CÁLCULO DE RECOMENDAÇÃO DE MERGULHO ---
-            let idealDiveHtml = '';
+            // NOTA: O bloco de cálculo e geração do idealDiveHtml foi removido
             
-            if (tideEvents.length >= 3) {
-                const diveTime1 = calculateMidpointTime(tideEvents[0].fxTime, tideEvents[1].fxTime);
-                const diveTime2 = calculateMidpointTime(tideEvents[1].fxTime, tideEvents[2].fxTime);
-
-                if (diveTime1 && diveTime2) {
-                    idealDiveHtml = `
-                        <p class="text-sm font-bold text-center text-blue-700 p-2 mt-4 rounded-md bg-yellow-100 border border-yellow-300">
-                            🌊 Mergulho/Maré Morta ideal entre <span class="text-lg font-extrabold">${diveTime1}</span> e <span class="text-lg font-extrabold">${diveTime2}</span>!
-                        </p>
-                    `;
-                }
-            }
-            
-            resultsHtml += idealDiveHtml;
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
 
             tideEvents.forEach(event => {
@@ -251,7 +226,7 @@
                     } else if (response.status === 404) {
                         errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
                     } else if (data.code && data.code !== '200') {
-                        errorMessage = `Erro QWeather (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
+                        errorMessage = `Erro QWEATHER (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
                     } else if (data.error) {
                         errorMessage = `Erro do Servidor (500): ${data.error}`;
                     } else {
@@ -306,3 +281,4 @@
     </script>
 </body>
 </html>
+
