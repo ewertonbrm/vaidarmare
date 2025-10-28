@@ -273,6 +273,25 @@
             // Define a data atual como padrão
             dateInput.value = getTodayDate();
         };
+		
+		// Novo bloco de registro do Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // O escopo deve corresponder ao caminho raiz da sua aplicação
+                // Assumindo que o service-worker.js esteja na raiz do repositório
+                // ou no mesmo nível de index.html dentro da pasta 'vaidarmare/' se for o root da app
+                // Use '/vaidarmare/service-worker.js' se estiver na pasta 'vaidarmare' do servidor, 
+                // ou apenas '/service-worker.js' se for a raiz. 
+                // Baseado nos caminhos do seu service-worker.js, vamos assumir o caminho relativo:
+                navigator.serviceWorker.register('service-worker.js', { scope: './' })
+                    .then(registration => {
+                        console.log('Service Worker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Falha no registro do Service Worker:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
