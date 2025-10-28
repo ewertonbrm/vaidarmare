@@ -1,4 +1,4 @@
-const CACHE_NAME = 'torrentum-pwa-cache-v1';
+const CACHE_NAME = 'vaidarmare-pwa-cache-v1';
 // CAMINHOS AJUSTADOS
 const urlsToCache = [
     '/vaidarmare/',
@@ -50,5 +50,6 @@ self.addEventListener('activate', event => {
       );
     })
   );
+
 
 });
