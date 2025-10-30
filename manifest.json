@@ -1,12 +1,11 @@
-
 {
     "name": "Vai Dar Maré!",
     "short_name": "Vai Dar Maré!",
     "description": "Tábua das marés de Natal/RN.",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#003399",
-    "theme_color": "#003399",
+    "background_color": "#001F4F",
+    "theme_color": "#001F4F",
     "icons": [
         {
             "src": "/icon-192x192.png",
@@ -20,4 +19,3 @@
         }
     ]
 }
-
