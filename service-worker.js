@@ -1,11 +1,9 @@
-
 const CACHE_NAME = 'vaidarmare-pwa-cache-v3';
 // Arquivos essenciais para a "casca" do PWA
 const urlsToCache = [
     '/', // O Vercel serve o index.html a partir da raiz
     '/index.html',
     '/manifest.json',
-    '/vaida192.png', // Sua imagem de logo deve estar na raiz
     '/icon-192x192.png', // Caminhos corrigidos
     '/icon-512x512.png'  // Caminhos corrigidos
 ];
@@ -59,4 +57,3 @@ self.addEventListener('activate', event => {
     })
   );
 });
-
