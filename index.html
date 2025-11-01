@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vai Dar Maré!</title>
-    <!-- Referência ao Manifesto PWA (CRUCIAL) -->
     <link rel="manifest" href="/manifest.json">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +16,7 @@
         /* Define a fonte Oswald como padrão para o body, exceto onde 'cursive-title' é aplicado */
         body {
             font-family: 'Oswald', sans-serif;
-            background-color: #003399; /* Azul Royal */
+            background-color: #001F4F; /* Azul Profundo: Fundo da página */
         }
         /* Estilos adicionais para botões e cards */
         .card {
@@ -36,8 +35,12 @@
             theme: {
                 extend: {
                     colors: {
-                        'page-bg': '#003399', 
-                        'title-color': '#214469', 
+                        // Nova Paleta de Cores
+                        'page-bg': '#001F4F', // Azul Profundo - Fundo e Botão Principal
+                        'title-color': '#004C99', // Azul Médio - Títulos
+                        'card-bg': '#F8FAFC', // Azul Gelo - Fundo do Container de Resultados
+                        'tide-high': '#4A90E2', // Azul Claro - Maré Alta
+                        'tide-low': '#3C9B50', // Verde Mar - Maré Baixa
                     },
                     fontFamily: {
                         sans: ['Oswald', 'sans-serif'],
@@ -51,9 +54,8 @@
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
-        <!-- MARGEM ACIMA DA LOGO: pt-8 no body e o mt-4 aqui ajustam o espaçamento -->
         <div class="flex flex-col items-center mt-4 mb-4">
-            <img src="vaida192.png" class="w-32 md:w-40 rounded-full shadow-lg" alt="Logo Vai Dar Maré: Símbolo de ondas em tons de azul">
+            <img src="icon-192x192.png" class="w-32 md:w-40" alt="Logo Vai Dar Maré: Símbolo de ondas em tons de azul">
 
             <h2 class="cursive-title text-4xl font-extrabold text-title-color mt-2">
                 Vai Dar Maré!
@@ -73,19 +75,18 @@
             </div>
 
             <button type="submit" id="submitBtn" 
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-page-bg hover:bg-page-bg/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-page-bg transition duration-300 ease-in-out transform hover:scale-[1.01]">
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-page-bg hover:bg-title-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-title-color transition duration-300 ease-in-out transform hover:scale-[1.01]">
                 <span id="btnText">Consultar</span>
             </button>
         </form>
 
-        <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-gray-50 border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
+        <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-card-bg border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
 
             <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua.</p>
             <div id="tideList" class="w-full mt-4 space-y-3 hidden">
-                <!-- Resultados injetados aqui -->
-            </div>
+                </div>
             
-            <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-blue-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-tide-high hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -142,7 +143,8 @@
         function showError(msg) {
             message.textContent = msg;
             message.classList.remove('hidden'); 
-            resultsContainer.classList.remove('bg-gray-50', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
+            // Estilo de erro
+            resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-red-100', 'border-red-400');
             tideList.classList.add('hidden');
         }
@@ -165,7 +167,7 @@
         const displayTideData = (tideEvents) => {
             
             let resultsHtml = `
-                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Natal/RN - Eventos de Maré</h2>
+                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Eventos de Maré</h2>
             `;
             
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
@@ -173,11 +175,13 @@
             tideEvents.forEach(event => {
                 const isHighTide = event.type === 'H'; 
                 const icon = isHighTide ? '▲' : '▼';
-                const color = isHighTide ? 'text-blue-600' : 'text-green-600';
+                // Usando as novas variáveis Tailwind
+                const color = isHighTide ? 'text-tide-high' : 'text-tide-low';
+                const borderColor = isHighTide ? 'border-tide-high/50' : 'border-tide-low/50';
                 const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
 
                 resultsHtml += `
-                    <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${isHighTide ? 'border-blue-200' : 'border-green-200'}">
+                    <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${borderColor}">
                         <div class="flex items-center space-x-3">
                             <span class="text-xl font-bold ${color}">${icon}</span>
                             <div>
@@ -196,8 +200,9 @@
             message.textContent = '';
             message.classList.add('hidden');
             tideList.classList.remove('hidden');
-            resultsContainer.classList.remove('bg-gray-50', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
-            resultsContainer.classList.add('bg-blue-100', 'border-blue-400');
+            // Estilo de sucesso
+            resultsContainer.classList.remove('bg-card-bg', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
+            resultsContainer.classList.add('bg-tide-high/20', 'border-tide-high/50');
         };
 
         // Lógica da Consulta
@@ -208,28 +213,17 @@
             showLoading(true);
             message.textContent = 'Buscando dados...';
             message.classList.remove('hidden'); 
-            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-blue-100', 'border-blue-400', 'bg-yellow-100', 'border-yellow-400');
-            resultsContainer.classList.add('bg-gray-50', 'border-gray-200');
+            // Estilo de busca
+            resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-card-bg', 'border-gray-300');
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
 
-                // 1. CHECAGEM DE ERROS DE PROXY/SERVIÇO (Status HTTP não-OK)
                 if (!response.ok) {
                     let errorMessage = 'Ocorreu um erro desconhecido na comunicação.';
-                    
-                    // NOVO: Trata o erro 503 OFFLINE enviado pelo Service Worker
-                    if (response.status === 503 && data.code === 'OFFLINE_ERROR') {
-                         errorMessage = '⚠️ Você está offline. Não há dados em cache para esta data.';
-                         // Use a cor amarela de aviso
-                         resultsContainer.classList.remove('bg-gray-50');
-                         resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
-                         message.textContent = errorMessage;
-                         message.classList.remove('hidden');
-                         tideList.classList.add('hidden');
-                         return; // Sai da função
-                    } else if (response.status === 403) {
+                    if (response.status === 403) {
                         errorMessage = 'ERRO QWEATHER (Código 403): Chave Inválida ou Serviço de Marés não ativado.';
                     } else if (response.status === 404) {
                         errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
@@ -245,7 +239,6 @@
                     return;
                 }
                 
-                // 2. LÓGICA DE SUCESSO (Code 200)
                 if (data.code === '200') {
                     const tideEvents = data.tideTable; 
 
@@ -255,7 +248,8 @@
                         message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data.';
                         message.classList.remove('hidden');
                         tideList.classList.add('hidden');
-                        resultsContainer.classList.remove('bg-gray-50', 'bg-blue-100', 'border-blue-400');
+                        // Estilo de aviso
+                        resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50');
                         resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
                     }
                 } else {
