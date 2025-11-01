@@ -22,92 +22,137 @@
         .card {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
             backdrop-filter: blur(5px); /* Menos blur para leveza */
+            background-color: rgba(255, 255, 255, 1);
+            border: 1px solid rgba(229, 231, 235, 0.6);
         }
+        /* CLASSE CURSIVA EXPRESSIVA */
         .cursive-title {
             font-family: 'Playwrite DE SAS', cursive;
-            font-weight: 400; /* Peso padrão para a fonte */
-        }
-        /* Utilitários Tailwind customizados */
-        .text-title-color {
-            color: #FFD700; /* Dourado */
-        }
-        .bg-card-bg {
-            background-color: rgba(255, 255, 255, 0.85); /* Branco quase transparente */
-        }
-        .bg-blue-dark {
-            background-color: #001F4F;
-        }
-        .text-tide-high {
-            color: #0080FF; /* Azul Claro para Alta */
-        }
-        .text-tide-low {
-            color: #CC0000; /* Vermelho para Baixa */
         }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Nova Paleta de Cores (restauradas)
+                        'page-bg': '#001F4F', // Azul Profundo - Fundo e Botão Principal
+                        'title-color': '#004C99', // Azul Médio - Títulos
+                        'card-bg': '#F8FAFC', // Azul Gelo - Fundo do Container de Resultados
+                        'tide-high': '#4A90E2', // Azul Claro - Maré Alta
+                        'tide-low': '#3C9B50', // Verde Mar - Maré Baixa
+                    },
+                    fontFamily: {
+                        sans: ['Oswald', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
 </head>
-<body class="min-h-screen p-4 flex items-center justify-center">
+<body class="min-h-screen flex items-start justify-center pt-8 pb-4 px-4">
 
-    <div class="w-full max-w-md">
-        <header class="text-center mb-6">
-            <h1 class="cursive-title text-4xl font-bold text-title-color mb-1">
+    <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
+        
+        <div class="flex flex-col items-center mt-4 mb-4">
+            <img src="icon-192x192.png" class="w-32 md:w-40" alt="Logo Vai Dar Maré: Símbolo de ondas em tons de azul">
+
+            <h2 class="cursive-title text-4xl font-extrabold text-title-color mt-2">
                 Vai Dar Maré!
-            </h1>
-            <p class="text-white text-lg">Tábua de Marés de Natal/RN</p>
-        </header>
-
-        <main class="card p-6 rounded-xl border border-white/50">
+            </h2>
+        </div>
+        
+        <form id="tideForm" class="space-y-4">
             
-            <form id="tide-form" class="space-y-4 mb-6">
-                <div class="flex flex-col">
-                    <label for="date-input" class="text-gray-700 font-medium mb-1">Selecione a Data:</label>
-                    <input type="date" id="date-input" class="p-3 border border-gray-300 rounded-lg focus:ring-blue-dark focus:border-blue-dark transition duration-150">
-                </div>
-                
-                <button type="submit" id="submit-btn" class="w-full bg-blue-dark text-white p-3 rounded-lg font-semibold hover:bg-blue-900 transition duration-150 flex items-center justify-center space-x-2 disabled:opacity-50">
-                    <span id="btn-text">Consultar</span>
-                    <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </button>
-            </form>
+            <p class="text-sm font-medium text-gray-700 text-center py-2">
+                Tábua das Marés de Natal/RN.
+            </p>
 
-            <div id="results-container" class="p-4 rounded-lg border border-gray-300 bg-card-bg transition-colors duration-300">
-                <p id="message" class="text-center text-gray-700 font-medium">Selecione uma data para ver a tábua de marés.</p>
-                <div id="tide-list" class="hidden">
-                    </div>
+            <div>
+                <label for="dateInput" class="block text-sm font-medium text-gray-700">Data</label>
+                <input type="date" id="dateInput" required 
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-title-color focus:border-title-color transition duration-150 ease-in-out">
             </div>
 
-        </main>
+            <button type="submit" id="submitBtn" 
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-page-bg hover:bg-title-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-title-color transition duration-300 ease-in-out transform hover:scale-[1.01]">
+                <span id="btnText">Consultar</span>
+                <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
 
-        <footer class="text-center mt-6 text-white text-sm opacity-80">
-            <p>Dados fornecidos pela Stormglass API. Horários em UTC/GMT.</p>
-        </footer>
+        <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-card-bg border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
+
+            <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua.</p>
+            <div id="tideList" class="w-full mt-4 space-y-3 hidden">
+                </div>
+        </div>
+        
+        <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Stormglass API. Integração via Vercel Serverless Function.</p>
+        <p class="mt-1 text-xs text-center text-red-500 font-bold">⚠️ Horários em UTC/GMT.</p>
     </div>
 
     <script>
-        // Variáveis do DOM
-        const form = document.getElementById('tide-form');
-        const dateInput = document.getElementById('date-input');
-        const submitBtn = document.getElementById('submit-btn');
-        const btnText = document.getElementById('btn-text');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const message = document.getElementById('message');
-        const tideList = document.getElementById('tide-list');
-        const resultsContainer = document.getElementById('results-container');
+        // === REGISTRO DO SERVICE WORKER (PWA) ===
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('SW registrado com sucesso. Escopo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Falha no registro do SW:', error);
+                    });
+            });
+        }
+        // =========================================
 
-        // URL base para a nossa Serverless Function (proxy)
+        const form = document.getElementById('tideForm');
+        const dateInput = document.getElementById('dateInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const message = document.getElementById('message');
+        const tideList = document.getElementById('tideList');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        // O Spinner foi movido para dentro do botão para corresponder ao HTML
+        const loadingSpinner = document.getElementById('loadingSpinner'); 
+
         const API_BASE_URL = '/api/tide'; 
 
-        // --- Funções Auxiliares ---
-
-        // Função para obter a data de hoje no formato YYYY-MM-DD
-        const getTodayDate = () => {
+        // Funções de Utilidade
+        function getTodayDate() {
             const today = new Date();
-            return today.toISOString().split('T')[0];
-        };
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        
+        function showLoading(show) {
+            submitBtn.disabled = show;
+            btnText.classList.toggle('hidden', show); // Esconder o texto ao mostrar o spinner
+            loadingSpinner.classList.toggle('hidden', !show);
+            // Mostrar ou não o spinner
+            
+            if (show) {
+                tideList.classList.add('hidden');
+                tideList.innerHTML = '';
+            }
+        }
 
-        // Função para formatar o tempo ISO 8601 (ex: "2023-11-01T15:10:00+00:00") para HH:MM
+        function showError(msg) {
+            message.textContent = msg;
+            message.classList.remove('hidden'); 
+            // Estilo de erro
+            resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-red-100', 'border-red-400');
+            tideList.classList.add('hidden');
+            showLoading(false); // Garantir que a tela saia do estado de loading
+        }
+        
         const formatTime = (isoTime) => {
             try {
                 // Stormglass retorna em UTC, então especificamos 'UTC' para garantir que 
@@ -124,30 +169,6 @@
             }
         };
 
-        // Função para mostrar o estado de carregamento
-        const showLoading = (isLoading) => {
-            if (isLoading) {
-                loadingSpinner.classList.remove('hidden');
-                submitBtn.disabled = true;
-                btnText.textContent = 'Buscando...';
-            } else {
-                loadingSpinner.classList.add('hidden');
-                submitBtn.disabled = false;
-                btnText.textContent = 'Consultar';
-            }
-        };
-
-        // Função para mostrar mensagens de erro
-        const showError = (errorMessage) => {
-            tideList.classList.add('hidden');
-            message.textContent = errorMessage;
-            message.classList.remove('hidden');
-            // Estilo de erro
-            resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
-            resultsContainer.classList.add('bg-red-100', 'border-red-400');
-            showLoading(false);
-        };
-        
         // Função para exibir os dados na lista - Adaptada para Stormglass
         const displayTideData = (stormglassEvents) => {
             
@@ -194,9 +215,9 @@
             resultsContainer.classList.add('bg-tide-high/20', 'border-tide-high/50');
         };
 
-        // --- Lógica Principal de Consulta ---
+
+        // Lógica da Consulta
         async function fetchTideData(dateString) {
-            // dateString já está no formato YYYY-MM-DD, que é o que o backend espera como parâmetro 'date'
             const url = `${API_BASE_URL}?date=${dateString}`; 
 
             showLoading(true);
@@ -265,19 +286,6 @@
         window.onload = () => {
             dateInput.value = getTodayDate();
         };
-
-        // Registro do Service Worker para o PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha no registro do Service Worker:', error);
-                    });
-            });
-        }
     </script>
 </body>
 </html>
