@@ -35,7 +35,7 @@
             theme: {
                 extend: {
                     colors: {
-                        // Nova Paleta de Cores (restauradas)
+                        // Nova Paleta de Cores
                         'page-bg': '#001F4F', // Azul Profundo - Fundo e Botão Principal
                         'title-color': '#004C99', // Azul Médio - Títulos
                         'card-bg': '#F8FAFC', // Azul Gelo - Fundo do Container de Resultados
@@ -92,7 +92,7 @@
         </div>
         
         <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Stormglass API. Integração via Vercel Serverless Function.</p>
-        <p class="mt-1 text-xs text-center text-red-500 font-bold">⚠️ Horários em UTC/GMT.</p>
+        <p class="mt-1 text-xs text-center text-gray-500 font-bold">Horários exibidos em GMT -3 (Hora de Natal/RN).</p>
     </div>
 
     <script>
@@ -117,7 +117,6 @@
         const tideList = document.getElementById('tideList');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
-        // O Spinner foi movido para dentro do botão para corresponder ao HTML
         const loadingSpinner = document.getElementById('loadingSpinner'); 
 
         const API_BASE_URL = '/api/tide'; 
@@ -133,9 +132,8 @@
         
         function showLoading(show) {
             submitBtn.disabled = show;
-            btnText.classList.toggle('hidden', show); // Esconder o texto ao mostrar o spinner
+            btnText.classList.toggle('hidden', show); 
             loadingSpinner.classList.toggle('hidden', !show);
-            // Mostrar ou não o spinner
             
             if (show) {
                 tideList.classList.add('hidden');
@@ -150,20 +148,22 @@
             resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-red-100', 'border-red-400');
             tideList.classList.add('hidden');
-            showLoading(false); // Garantir que a tela saia do estado de loading
+            showLoading(false); 
         }
         
+        // CORREÇÃO: Função para formatar o tempo para o fuso horário de Natal/RN (America/Fortaleza = GMT -3)
         const formatTime = (isoTime) => {
             try {
-                // Stormglass retorna em UTC, então especificamos 'UTC' para garantir que 
-                // a conversão não seja afetada pelo fuso horário local do cliente, mantendo o horário da API.
                 const date = new Date(isoTime); 
-                return date.toLocaleTimeString('pt-BR', { 
+                
+                const options = { 
                     hour: '2-digit', 
                     minute: '2-digit', 
                     hour12: false,
-                    timeZone: 'UTC' 
-                });
+                    timeZone: 'America/Fortaleza' // Fuso horário de Natal/RN
+                };
+                
+                return date.toLocaleTimeString('pt-BR', options);
             } catch (e) {
                 return 'N/A';
             }
@@ -173,7 +173,7 @@
         const displayTideData = (stormglassEvents) => {
             
             let resultsHtml = `
-                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Eventos de Maré (UTC/GMT)</h2>
+                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Eventos de Maré</h2>
             `; 
 
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
@@ -229,7 +229,6 @@
 
             try {
                 const response = await fetch(url);
-                // Tentar ler como JSON, pois o backend Serverless envia JSON (incluindo JSON de erro)
                 const data = await response.json(); 
 
                 if (!response.ok) {
@@ -249,7 +248,6 @@
                     return;
                 }
                 
-                // Stormglass retorna os eventos de maré dentro de um array chamado 'data'
                 const tideEvents = data.data; 
 
                 if (tideEvents && tideEvents.length > 0) {
