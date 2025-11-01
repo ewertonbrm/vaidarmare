@@ -1,10 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/tide",
-      "destination": "https://api.qweather.com/v7/ocean/tide"
-    }
-  ]
     "headers": [
       {
         "source": "/service-worker.js",
@@ -34,4 +28,3 @@
       }
     ]
 }
-
