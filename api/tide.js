@@ -4,8 +4,8 @@
 const STORMGLASS_BASE_URL = 'https://api.stormglass.io/v2/tide/extremes/point';
 
 // Coordenadas fixas para Natal/RN (aproximadas)
-const NATAL_LAT = -5.795;
-const NATAL_LNG = -35.210;
+const NATAL_LAT = -5.8487;
+const NATAL_LNG = -35.2540;
 
 // Handler principal para a Vercel Serverless Function
 export default async function handler(req, res) {
