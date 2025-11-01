@@ -22,174 +22,163 @@
         .card {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
             backdrop-filter: blur(5px); /* Menos blur para leveza */
-            background-color: rgba(255, 255, 255, 1);
-            border: 1px solid rgba(229, 231, 235, 0.6);
         }
-        /* CLASSE CURSIVA EXPRESSIVA */
         .cursive-title {
             font-family: 'Playwrite DE SAS', cursive;
+            font-weight: 400; /* Peso padrão para a fonte */
+        }
+        /* Utilitários Tailwind customizados */
+        .text-title-color {
+            color: #FFD700; /* Dourado */
+        }
+        .bg-card-bg {
+            background-color: rgba(255, 255, 255, 0.85); /* Branco quase transparente */
+        }
+        .bg-blue-dark {
+            background-color: #001F4F;
+        }
+        .text-tide-high {
+            color: #0080FF; /* Azul Claro para Alta */
+        }
+        .text-tide-low {
+            color: #CC0000; /* Vermelho para Baixa */
         }
     </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        // Nova Paleta de Cores
-                        'page-bg': '#001F4F', // Azul Profundo - Fundo e Botão Principal
-                        'title-color': '#004C99', // Azul Médio - Títulos
-                        'card-bg': '#F8FAFC', // Azul Gelo - Fundo do Container de Resultados
-                        'tide-high': '#4A90E2', // Azul Claro - Maré Alta
-                        'tide-low': '#3C9B50', // Verde Mar - Maré Baixa
-                    },
-                    fontFamily: {
-                        sans: ['Oswald', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
 </head>
-<body class="min-h-screen flex items-start justify-center pt-8 pb-4 px-4">
+<body class="min-h-screen p-4 flex items-center justify-center">
 
-    <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
-        
-        <div class="flex flex-col items-center mt-4 mb-4">
-            <img src="icon-192x192.png" class="w-32 md:w-40" alt="Logo Vai Dar Maré: Símbolo de ondas em tons de azul">
-
-            <h2 class="cursive-title text-4xl font-extrabold text-title-color mt-2">
+    <div class="w-full max-w-md">
+        <header class="text-center mb-6">
+            <h1 class="cursive-title text-4xl font-bold text-title-color mb-1">
                 Vai Dar Maré!
-            </h2>
-        </div>
-        
-        <form id="tideForm" class="space-y-4">
-            
-            <p class="text-sm font-medium text-gray-700 text-center py-2">
-                Tábua das Marés de Natal/RN.
-            </p>
+            </h1>
+            <p class="text-white text-lg">Tábua de Marés de Natal/RN</p>
+        </header>
 
-            <div>
-                <label for="dateInput" class="block text-sm font-medium text-gray-700">Data</label>
-                <input type="date" id="dateInput" required 
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-title-color focus:border-title-color transition duration-150 ease-in-out">
+        <main class="card p-6 rounded-xl border border-white/50">
+            
+            <form id="tide-form" class="space-y-4 mb-6">
+                <div class="flex flex-col">
+                    <label for="date-input" class="text-gray-700 font-medium mb-1">Selecione a Data:</label>
+                    <input type="date" id="date-input" class="p-3 border border-gray-300 rounded-lg focus:ring-blue-dark focus:border-blue-dark transition duration-150">
+                </div>
+                
+                <button type="submit" id="submit-btn" class="w-full bg-blue-dark text-white p-3 rounded-lg font-semibold hover:bg-blue-900 transition duration-150 flex items-center justify-center space-x-2 disabled:opacity-50">
+                    <span id="btn-text">Consultar</span>
+                    <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <div id="results-container" class="p-4 rounded-lg border border-gray-300 bg-card-bg transition-colors duration-300">
+                <p id="message" class="text-center text-gray-700 font-medium">Selecione uma data para ver a tábua de marés.</p>
+                <div id="tide-list" class="hidden">
+                    </div>
             </div>
 
-            <button type="submit" id="submitBtn" 
-                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-page-bg hover:bg-title-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-title-color transition duration-300 ease-in-out transform hover:scale-[1.01]">
-                <span id="btnText">Consultar</span>
-            </button>
-        </form>
+        </main>
 
-        <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-card-bg border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
-
-            <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua.</p>
-            <div id="tideList" class="w-full mt-4 space-y-3 hidden">
-                </div>
-            
-            <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-6 w-6 text-tide-high hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-        </div>
-        
-        <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela QWeather. Integração via Vercel Serverless Function.</p>
+        <footer class="text-center mt-6 text-white text-sm opacity-80">
+            <p>Dados fornecidos pela Stormglass API. Horários em UTC/GMT.</p>
+        </footer>
     </div>
 
     <script>
-        // === REGISTRO DO SERVICE WORKER (PWA) ===
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('SW registrado com sucesso. Escopo:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('Falha no registro do SW:', error);
-                    });
-            });
-        }
-        // =========================================
-
-        const form = document.getElementById('tideForm');
-        const dateInput = document.getElementById('dateInput');
-        const resultsContainer = document.getElementById('resultsContainer');
+        // Variáveis do DOM
+        const form = document.getElementById('tide-form');
+        const dateInput = document.getElementById('date-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
         const message = document.getElementById('message');
-        const tideList = document.getElementById('tideList');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
+        const tideList = document.getElementById('tide-list');
+        const resultsContainer = document.getElementById('results-container');
 
-        // VALOR FIXO: ID da localização de Natal/RN
-        const LOCATION_ID = 'P24427'; 
+        // URL base para a nossa Serverless Function (proxy)
         const API_BASE_URL = '/api/tide'; 
 
-        // Funções de Utilidade
-        function getTodayDate() {
+        // --- Funções Auxiliares ---
+
+        // Função para obter a data de hoje no formato YYYY-MM-DD
+        const getTodayDate = () => {
             const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd}`;
-        }
-        
-        function showLoading(show) {
-            submitBtn.disabled = show;
-            btnText.textContent = show ? 'Consultando...' : 'Consultar';
-            loadingSpinner.classList.toggle('hidden', !show);
-            tideList.classList.add('hidden');
-            tideList.innerHTML = '';
-        }
-
-        function showError(msg) {
-            message.textContent = msg;
-            message.classList.remove('hidden'); 
-            // Estilo de erro
-            resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high', 'bg-yellow-100', 'border-yellow-400');
-            resultsContainer.classList.add('bg-red-100', 'border-red-400');
-            tideList.classList.add('hidden');
-        }
-
-        const formatDate = (dateString) => {
-            const [year, month, day] = dateString.split('-');
-            return `${year}${month}${day}`;
+            return today.toISOString().split('T')[0];
         };
-        
+
+        // Função para formatar o tempo ISO 8601 (ex: "2023-11-01T15:10:00+00:00") para HH:MM
         const formatTime = (isoTime) => {
             try {
-                const date = new Date(isoTime);
-                return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+                // Stormglass retorna em UTC, então especificamos 'UTC' para garantir que 
+                // a conversão não seja afetada pelo fuso horário local do cliente, mantendo o horário da API.
+                const date = new Date(isoTime); 
+                return date.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false,
+                    timeZone: 'UTC' 
+                });
             } catch (e) {
                 return 'N/A';
             }
         };
 
-        // Função para exibir os dados na lista
-        const displayTideData = (tideEvents) => {
+        // Função para mostrar o estado de carregamento
+        const showLoading = (isLoading) => {
+            if (isLoading) {
+                loadingSpinner.classList.remove('hidden');
+                submitBtn.disabled = true;
+                btnText.textContent = 'Buscando...';
+            } else {
+                loadingSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+                btnText.textContent = 'Consultar';
+            }
+        };
+
+        // Função para mostrar mensagens de erro
+        const showError = (errorMessage) => {
+            tideList.classList.add('hidden');
+            message.textContent = errorMessage;
+            message.classList.remove('hidden');
+            // Estilo de erro
+            resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
+            resultsContainer.classList.add('bg-red-100', 'border-red-400');
+            showLoading(false);
+        };
+        
+        // Função para exibir os dados na lista - Adaptada para Stormglass
+        const displayTideData = (stormglassEvents) => {
             
             let resultsHtml = `
-                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Eventos de Maré</h2>
-            `;
-            
+                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Eventos de Maré (UTC/GMT)</h2>
+            `; 
+
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
 
-            tideEvents.forEach(event => {
-                const isHighTide = event.type === 'H'; 
+            // stormglassEvents é o array 'data'
+            stormglassEvents.forEach(event => {
+                // Stormglass usa 'high' ou 'low'
+                const isHighTide = event.type === 'high'; 
                 const icon = isHighTide ? '▲' : '▼';
-                // Usando as novas variáveis Tailwind
+                
+                // Classes Tailwind customizadas
                 const color = isHighTide ? 'text-tide-high' : 'text-tide-low';
                 const borderColor = isHighTide ? 'border-tide-high/50' : 'border-tide-low/50';
                 const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
 
+                // Stormglass retorna 'height' e 'time'
                 resultsHtml += `
                     <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${borderColor}">
                         <div class="flex items-center space-x-3">
                             <span class="text-xl font-bold ${color}">${icon}</span>
                             <div>
                                 <p class="font-medium text-gray-900">${label}</p>
-                                <p class="text-xs text-gray-500">Altura: ${event.height}m</p>
+                                <p class="text-xs text-gray-500">Altura: ${event.height.toFixed(2)}m</p>
                             </div>
                         </div>
-                        <span class="text-lg font-bold text-gray-700">${formatTime(event.fxTime)}</span>
+                        <span class="text-lg font-bold text-gray-700">${formatTime(event.time)}</span>
                     </div>
                 `;
             });
@@ -205,10 +194,10 @@
             resultsContainer.classList.add('bg-tide-high/20', 'border-tide-high/50');
         };
 
-        // Lógica da Consulta
+        // --- Lógica Principal de Consulta ---
         async function fetchTideData(dateString) {
-            const formattedDate = formatDate(dateString);
-            const url = `${API_BASE_URL}?location=${LOCATION_ID}&date=${formattedDate}`; 
+            // dateString já está no formato YYYY-MM-DD, que é o que o backend espera como parâmetro 'date'
+            const url = `${API_BASE_URL}?date=${dateString}`; 
 
             showLoading(true);
             message.textContent = 'Buscando dados...';
@@ -219,18 +208,18 @@
 
             try {
                 const response = await fetch(url);
-                const data = await response.json();
+                // Tentar ler como JSON, pois o backend Serverless envia JSON (incluindo JSON de erro)
+                const data = await response.json(); 
 
                 if (!response.ok) {
                     let errorMessage = 'Ocorreu um erro desconhecido na comunicação.';
-                    if (response.status === 403) {
-                        errorMessage = 'ERRO QWEATHER (Código 403): Chave Inválida ou Serviço de Marés não ativado.';
-                    } else if (response.status === 404) {
-                        errorMessage = 'Erro 404: Endpoint da função Serverless não encontrado. Verifique se o arquivo api/tide.js está no Vercel.';
-                    } else if (data.code && data.code !== '200') {
-                        errorMessage = `Erro QWEATHER (Código ${data.code}): ${data.msg || 'Detalhe não disponível.'}`;
+                    if (response.status === 429) {
+                        errorMessage = 'ERRO STORMGLASS (429): Limite de Requisições (Rate Limit) Atingido. Tente novamente mais tarde.';
+                    } else if (response.status === 403) {
+                         errorMessage = 'ERRO STORMGLASS (403): Chave Inválida ou Plano sem Acesso a Marés. Verifique a Variável de Ambiente.';
                     } else if (data.error) {
-                        errorMessage = `Erro do Servidor (500): ${data.error}`;
+                        // Erro vindo do nosso Serverless Function
+                        errorMessage = `Erro do Servidor (${response.status}): ${data.error}. Detalhes: ${data.details}`;
                     } else {
                         errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
                     }
@@ -239,30 +228,25 @@
                     return;
                 }
                 
-                if (data.code === '200') {
-                    const tideEvents = data.tideTable; 
+                // Stormglass retorna os eventos de maré dentro de um array chamado 'data'
+                const tideEvents = data.data; 
 
-                    if (tideEvents && tideEvents.length > 0) {
-                        displayTideData(tideEvents);
-                    } else {
-                        message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data.';
-                        message.classList.remove('hidden');
-                        tideList.classList.add('hidden');
-                        // Estilo de aviso
-                        resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50');
-                        resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
-                    }
+                if (tideEvents && tideEvents.length > 0) {
+                    displayTideData(tideEvents);
                 } else {
-                    showError(`Erro na Consulta: Código ${data.code}. ${data.msg || 'Detalhe não disponível.'}`);
+                    message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data ou local.';
+                    message.classList.remove('hidden');
+                    tideList.classList.add('hidden');
+                    // Estilo de aviso
+                    resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50');
+                    resultsContainer.classList.add('bg-yellow-100', 'border-yellow-400');
                 }
 
             } catch (error) {
                 console.error('Erro de rede ou Serverless Function:', error);
                 showError(`Erro de Comunicação: Verifique a sua conexão ou os logs do Vercel. Detalhe: ${error.message}`);
             } finally {
-                loadingSpinner.classList.add('hidden');
-                submitBtn.disabled = false;
-                btnText.textContent = 'Consultar';
+                showLoading(false);
             }
         }
 
@@ -277,10 +261,23 @@
             }
         });
 
-        // Inicialização 
+        // Inicialização: Define a data de hoje por padrão
         window.onload = () => {
             dateInput.value = getTodayDate();
         };
+
+        // Registro do Service Worker para o PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Falha no registro do Service Worker:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
