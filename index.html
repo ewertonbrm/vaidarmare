@@ -91,11 +91,379 @@
                 </div>
         </div>
         
-        <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Stormglass API. Integração via Vercel Serverless Function.</p>
+        <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Diretoria de Hidrografia e Navegação (DHN).</p>
         <p class="mt-1 text-xs text-center text-gray-500 font-bold">Horários exibidos em GMT -3 (Hora de Natal/RN).</p>
     </div>
 
     <script>
+        // === DADOS OFICIAIS DE MARÉ (NOVEMBRO/DEZEMBRO 2025) ===
+        // Fonte: Porto de Natal - Capitania dos Portos do RN
+        // Fuso Horário: UTC-03.0 horas (Hora de Natal/RN)
+        // OBS: Os dados negativos de altura referem-se a marés mais baixas que o nível de referência oficial (LAT).
+        const TIDE_DATA_2025 = {
+            // === NOVEMBRO 2025 ===
+            "2025-11-01": [
+                { "type": "high", "time": "00:40", "height": 2.01 },
+                { "type": "low", "time": "06:51", "height": 0.52 },
+                { "type": "high", "time": "13:17", "height": 2.03 },
+                { "type": "low", "time": "19:12", "height": 0.58 }
+            ],
+            "2025-11-02": [
+                { "type": "high", "time": "01:28", "height": 1.96 },
+                { "type": "low", "time": "07:37", "height": 0.59 },
+                { "type": "high", "time": "14:02", "height": 1.96 },
+                { "type": "low", "time": "19:57", "height": 0.64 }
+            ],
+            "2025-11-03": [
+                { "type": "high", "time": "02:18", "height": 1.88 },
+                { "type": "low", "time": "08:24", "height": 0.67 },
+                { "type": "high", "time": "14:48", "height": 1.87 },
+                { "type": "low", "time": "20:46", "height": 0.70 }
+            ],
+            "2025-11-04": [
+                { "type": "high", "time": "03:12", "height": 1.77 },
+                { "type": "low", "time": "09:15", "height": 0.75 },
+                { "type": "high", "time": "15:37", "height": 1.76 },
+                { "type": "low", "time": "21:40", "height": 0.76 }
+            ],
+            "2025-11-05": [
+                { "type": "high", "time": "04:14", "height": 1.66 },
+                { "type": "low", "time": "10:13", "height": 0.82 },
+                { "type": "high", "time": "16:32", "height": 1.63 },
+                { "type": "low", "time": "22:42", "height": 0.82 }
+            ],
+            "2025-11-06": [
+                { "type": "high", "time": "05:27", "height": 1.57 },
+                { "type": "low", "time": "11:21", "height": 0.85 },
+                { "type": "high", "time": "17:35", "height": 1.53 },
+                { "type": "low": "23:53", "height": 0.85 }
+            ],
+            "2025-11-07": [
+                { "type": "low", "time": "12:35", "height": 0.84 },
+                { "type": "high", "time": "06:47", "height": 1.55 },
+                { "type": "high", "time": "18:47", "height": 1.50 }
+            ],
+            "2025-11-08": [
+                { "type": "high", "time": "01:08", "height": 1.48 },
+                { "type": "low", "time": "08:14", "height": 0.58 },
+                { "type": "low", "time": "13:46", "height": 0.79 },
+                { "type": "high", "time": "20:01", "height": 1.60 }
+            ],
+            "2025-11-09": [
+                { "type": "high", "time": "02:14", "height": 1.68 },
+                { "type": "low", "time": "09:10", "height": 0.38 },
+                { "type": "low", "time": "14:46", "height": 0.70 },
+                { "type": "high", "time": "21:05", "height": 1.83 }
+            ],
+            "2025-11-10": [
+                { "type": "high", "time": "03:10", "height": 1.92 },
+                { "type": "low", "time": "10:01", "height": 0.17 },
+                { "type": "low", "time": "15:38", "height": 0.58 },
+                { "type": "high", "time": "21:59", "height": 2.06 }
+            ],
+            "2025-11-11": [
+                { "type": "high", "time": "03:59", "height": 2.15 },
+                { "type": "low", "time": "10:48", "height": 0.00 },
+                { "type": "low", "time": "16:24", "height": 0.47 },
+                { "type": "high", "time": "22:47", "height": 2.26 }
+            ],
+            "2025-11-12": [
+                { "type": "high", "time": "04:43", "height": 2.34 },
+                { "type": "low", "time": "11:32", "height": -0.11 },
+                { "type": "low", "time": "17:08", "height": 0.38 },
+                { "type": "high", "time": "23:31", "height": 2.42 }
+            ],
+            "2025-11-13": [
+                { "type": "high", "time": "05:25", "height": 2.50 },
+                { "type": "low", "time": "12:14", "height": -0.18 },
+                { "type": "low", "time": "17:50", "height": 0.32 }
+            ],
+            "2025-11-14": [
+                { "type": "high", "time": "00:13", "height": 2.54 },
+                { "type": "low", "time": "12:55", "height": -0.21 },
+                { "type": "high", "time": "06:05", "height": 2.61 },
+                { "type": "low", "time": "18:31", "height": 0.28 }
+            ],
+            "2025-11-15": [
+                { "type": "high", "time": "00:54", "height": 2.62 },
+                { "type": "low", "time": "13:36", "height": -0.20 },
+                { "type": "high", "time": "06:44", "height": 2.66 },
+                { "type": "low", "time": "19:12", "height": 0.28 }
+            ],
+            "2025-11-16": [
+                { "type": "high", "time": "01:34", "height": 2.65 },
+                { "type": "low", "time": "14:17", "height": -0.16 },
+                { "type": "high", "time": "07:23", "height": 2.66 },
+                { "type": "low", "time": "19:54", "height": 0.31 }
+            ],
+            "2025-11-17": [
+                { "type": "high", "time": "02:15", "height": 2.64 },
+                { "type": "low", "time": "14:59", "height": -0.09 },
+                { "type": "high", "time": "08:02", "height": 2.62 },
+                { "type": "low", "time": "20:38", "height": 0.36 }
+            ],
+            "2025-11-18": [
+                { "type": "high", "time": "02:58", "height": 2.58 },
+                { "type": "low", "time": "15:43", "height": 0.00 },
+                { "type": "high", "time": "08:44", "height": 2.54 },
+                { "type": "low", "time": "21:26", "height": 0.44 }
+            ],
+            "2025-11-19": [
+                { "type": "high", "time": "03:45", "height": 2.49 },
+                { "type": "low", "time": "16:30", "height": 0.12 },
+                { "type": "high", "time": "09:30", "height": 2.44 },
+                { "type": "low", "time": "22:19", "height": 0.54 }
+            ],
+            "2025-11-20": [
+                { "type": "high", "time": "04:36", "height": 2.37 },
+                { "type": "low", "time": "17:21", "height": 0.25 },
+                { "type": "high", "time": "10:25", "height": 2.31 },
+                { "type": "low", "time": "23:20", "height": 0.65 }
+            ],
+            "2025-11-21": [
+                { "type": "high", "time": "05:37", "height": 2.25 },
+                { "type": "low", "time": "18:18", "height": 0.38 },
+                { "type": "high", "time": "11:30", "height": 2.18 }
+            ],
+            "2025-11-22": [
+                { "type": "low", "time": "00:30", "height": 0.76 },
+                { "type": "low", "time": "19:20", "height": 0.50 },
+                { "type": "high", "time": "06:51", "height": 2.18 },
+                { "type": "high", "time": "12:51", "height": 2.08 }
+            ],
+            "2025-11-23": [
+                { "type": "low", "time": "01:46", "height": 0.85 },
+                { "type": "low", "time": "20:25", "height": 0.60 },
+                { "type": "high", "time": "08:24", "height": 2.21 },
+                { "type": "high", "time": "14:19", "height": 2.05 }
+            ],
+            "2025-11-24": [
+                { "type": "low", "time": "03:07", "height": 0.90 },
+                { "type": "low", "time": "21:30", "height": 0.68 },
+                { "type": "high", "time": "09:47", "height": 2.33 },
+                { "type": "high", "time": "15:37", "height": 2.11 }
+            ],
+            "2025-11-25": [
+                { "type": "low", "time": "04:23", "height": 0.90 },
+                { "type": "low", "time": "22:30", "height": 0.74 },
+                { "type": "high", "time": "10:53", "height": 2.50 },
+                { "type": "high", "time": "16:40", "height": 2.24 }
+            ],
+            "2025-11-26": [
+                { "type": "low", "time": "05:27", "height": 0.85 },
+                { "type": "low", "time": "23:25", "height": 0.77 },
+                { "type": "high", "time": "11:47", "height": 2.66 },
+                { "type": "high", "time": "17:34", "height": 2.40 }
+            ],
+            "2025-11-27": [
+                { "type": "low", "time": "06:23", "height": 0.77 },
+                { "type": "high", "time": "12:35", "height": 2.79 },
+                { "type": "high", "time": "18:24", "height": 2.56 }
+            ],
+            "2025-11-28": [
+                { "type": "high", "time": "00:15", "height": 2.78 },
+                { "type": "low", "time": "07:14", "height": 0.67 },
+                { "type": "high", "time": "13:20", "height": 2.87 },
+                { "type": "low", "time": "19:11", "height": 0.74 }
+            ],
+            "2025-11-29": [
+                { "type": "high", "time": "01:03", "height": 2.71 },
+                { "type": "low", "time": "08:02", "height": 0.58 },
+                { "type": "high", "time": "14:04", "height": 2.88 },
+                { "type": "low", "time": "19:55", "height": 0.71 }
+            ],
+            "2025-11-30": [
+                { "type": "high", "time": "01:49", "height": 2.70 },
+                { "type": "low", "time": "08:48", "height": 0.52 },
+                { "type": "high", "time": "14:48", "height": 2.83 },
+                { "type": "low", "time": "20:39", "height": 0.70 }
+            ],
+            // === DEZEMBRO 2025 ===
+            "2025-12-01": [
+                { "type": "high", "time": "02:34", "height": 2.66 },
+                { "type": "low", "time": "09:34", "height": 0.49 },
+                { "type": "high", "time": "15:32", "height": 2.74 },
+                { "type": "low", "time": "21:23", "height": 0.71 }
+            ],
+            "2025-12-02": [
+                { "type": "high", "time": "03:19", "height": 2.59 },
+                { "type": "low", "time": "10:18", "height": 0.49 },
+                { "type": "high", "time": "16:16", "height": 2.62 },
+                { "type": "low", "time": "22:07", "height": 0.74 }
+            ],
+            "2025-12-03": [
+                { "type": "high", "time": "04:05", "height": 2.49 },
+                { "type": "low", "time": "11:04", "height": 0.52 },
+                { "type": "high", "time": "17:01", "height": 2.49 },
+                { "type": "low", "time": "22:53", "height": 0.79 }
+            ],
+            "2025-12-04": [
+                { "type": "high", "time": "04:54", "height": 2.37 },
+                { "type": "low", "time": "11:53", "height": 0.57 },
+                { "type": "high", "time": "17:49", "height": 2.35 },
+                { "type": "low", "time": "23:42", "height": 0.85 }
+            ],
+            "2025-12-05": [
+                { "type": "high", "time": "05:48", "height": 2.24 },
+                { "type": "low", "time": "12:47", "height": 0.63 },
+                { "type": "high", "time": "18:43", "height": 2.21 }
+            ],
+            "2025-12-06": [
+                { "type": "low", "time": "00:36", "height": 0.90 },
+                { "type": "low", "time": "13:48", "height": 0.69 },
+                { "type": "high", "time": "06:53", "height": 2.12 },
+                { "type": "high", "time": "19:44", "height": 2.09 }
+            ],
+            "2025-12-07": [
+                { "type": "low", "time": "01:38", "height": 0.92 },
+                { "type": "low", "time": "14:58", "height": 0.73 },
+                { "type": "high", "time": "08:12", "height": 2.07 },
+                { "type": "high", "time": "20:53", "height": 2.01 }
+            ],
+            "2025-12-08": [
+                { "type": "low", "time": "02:51", "height": 0.91 },
+                { "type": "low", "time": "16:11", "height": 0.74 },
+                { "type": "high", "time": "09:32", "height": 2.11 },
+                { "type": "high", "time": "22:01", "height": 2.01 }
+            ],
+            "2025-12-09": [
+                { "type": "low", "time": "04:02", "height": 0.85 },
+                { "type": "low", "time": "17:15", "height": 0.70 },
+                { "type": "high", "time": "10:43", "height": 2.25 },
+                { "type": "high", "time": "22:58", "height": 2.09 }
+            ],
+            "2025-12-10": [
+                { "type": "low", "time": "05:03", "height": 0.77 },
+                { "type": "low", "time": "18:11", "height": 0.63 },
+                { "type": "high", "time": "11:39", "height": 2.45 },
+                { "type": "high", "time": "23:45", "height": 2.22 }
+            ],
+            "2025-12-11": [
+                { "type": "low", "time": "05:54", "height": 0.69 },
+                { "type": "low", "time": "18:59", "height": 0.53 },
+                { "type": "high", "time": "12:28", "height": 2.65 }
+            ],
+            "2025-12-12": [
+                { "type": "high", "time": "00:27", "height": 2.37 },
+                { "type": "low", "time": "06:37", "height": 0.60 },
+                { "type": "low", "time": "19:42", "height": 0.44 },
+                { "type": "high", "time": "13:14", "height": 2.80 }
+            ],
+            "2025-12-13": [
+                { "type": "high", "time": "01:07", "height": 2.52 },
+                { "type": "low", "time": "07:18", "height": 0.53 },
+                { "type": "low", "time": "20:23", "height": 0.38 },
+                { "type": "high", "time": "13:56", "height": 2.91 }
+            ],
+            "2025-12-14": [
+                { "type": "high", "time": "01:45", "height": 2.65 },
+                { "type": "low", "time": "07:56", "height": 0.48 },
+                { "type": "low", "time": "21:03", "height": 0.35 },
+                { "type": "high", "time": "14:36", "height": 2.97 }
+            ],
+            "2025-12-15": [
+                { "type": "high", "time": "02:22", "height": 2.76 },
+                { "type": "low", "time": "08:34", "height": 0.45 },
+                { "type": "low", "time": "21:42", "height": 0.34 },
+                { "type": "high", "time": "15:15", "height": 2.97 }
+            ],
+            "2025-12-16": [
+                { "type": "high", "time": "02:59", "height": 2.83 },
+                { "type": "low", "time": "09:11", "height": 0.44 },
+                { "type": "low", "time": "22:21", "height": 0.35 },
+                { "type": "high", "time": "15:53", "height": 2.93 }
+            ],
+            "2025-12-17": [
+                { "type": "high", "time": "03:36", "height": 2.86 },
+                { "type": "low", "time": "09:47", "height": 0.45 },
+                { "type": "low", "time": "23:01", "height": 0.38 },
+                { "type": "high", "time": "16:32", "height": 2.85 }
+            ],
+            "2025-12-18": [
+                { "type": "high", "time": "04:14", "height": 2.84 },
+                { "type": "low", "time": "10:24", "height": 0.49 },
+                { "type": "low", "time": "23:42", "height": 0.43 },
+                { "type": "high", "time": "17:12", "height": 2.74 }
+            ],
+            "2025-12-19": [
+                { "type": "high", "time": "04:54", "height": 2.78 },
+                { "type": "low", "time": "11:02", "height": 0.55 },
+                { "type": "high", "time": "17:54", "height": 2.61 }
+            ],
+            "2025-12-20": [
+                { "type": "low", "time": "00:25", "height": 0.50 },
+                { "type": "low", "time": "11:43", "height": 0.63 },
+                { "type": "high", "time": "05:37", "height": 2.67 },
+                { "type": "high", "time": "18:38", "height": 2.47 }
+            ],
+            "2025-12-21": [
+                { "type": "low", "time": "01:12", "height": 0.59 },
+                { "type": "low", "time": "12:27", "height": 0.72 },
+                { "type": "high", "time": "06:24", "height": 2.53 },
+                { "type": "high", "time": "19:28", "height": 2.34 }
+            ],
+            "2025-12-22": [
+                { "type": "low", "time": "02:07", "height": 0.69 },
+                { "type": "low", "time": "13:18", "height": 0.81 },
+                { "type": "high", "time": "07:20", "height": 2.37 },
+                { "type": "high", "time": "20:26", "height": 2.22 }
+            ],
+            "2025-12-23": [
+                { "type": "low", "time": "03:13", "height": 0.80 },
+                { "type": "low", "time": "14:18", "height": 0.88 },
+                { "type": "high", "time": "08:33", "height": 2.25 },
+                { "type": "high", "time": "21:37", "height": 2.15 }
+            ],
+            "2025-12-24": [
+                { "type": "low", "time": "04:31", "height": 0.88 },
+                { "type": "low", "time": "15:32", "height": 0.92 },
+                { "type": "high", "time": "10:13", "height": 2.24 },
+                { "type": "high", "time": "22:56", "height": 2.18 }
+            ],
+            "2025-12-25": [
+                { "type": "low", "time": "05:49", "height": 0.90 },
+                { "type": "low", "time": "16:47", "height": 0.92 },
+                { "type": "high", "time": "11:32", "height": 2.38 }
+            ],
+            "2025-12-26": [
+                { "type": "high", "time": "00:13", "height": 2.29 },
+                { "type": "low", "time": "06:56", "height": 0.87 },
+                { "type": "low", "time": "17:53", "height": 0.88 },
+                { "type": "high", "time": "12:35", "height": 2.58 }
+            ],
+            "2025-12-27": [
+                { "type": "high", "time": "01:17", "height": 2.44 },
+                { "type": "low", "time": "07:54", "height": 0.80 },
+                { "type": "low", "time": "18:48", "height": 0.82 },
+                { "type": "high", "time": "13:28", "height": 2.76 }
+            ],
+            "2025-12-28": [
+                { "type": "high", "time": "02:12", "height": 2.62 },
+                { "type": "low", "time": "08:45", "height": 0.70 },
+                { "type": "low", "time": "19:37", "height": 0.75 },
+                { "type": "high", "time": "14:15", "height": 2.89 }
+            ],
+            "2025-12-29": [
+                { "type": "high", "time": "03:01", "height": 2.78 },
+                { "type": "low", "time": "09:33", "height": 0.60 },
+                { "type": "low", "time": "20:23", "height": 0.67 },
+                { "type": "high", "time": "14:59", "height": 2.97 }
+            ],
+            "2025-12-30": [
+                { "type": "high", "time": "03:46", "height": 2.90 },
+                { "type": "low", "time": "10:18", "height": 0.52 },
+                { "type": "low", "time": "21:07", "height": 0.60 },
+                { "type": "high", "time": "15:42", "height": 2.99 }
+            ],
+            "2025-12-31": [
+                { "type": "high", "time": "04:29", "height": 2.96 },
+                { "type": "low", "time": "11:01", "height": 0.46 },
+                { "type": "low", "time": "21:50", "height": 0.54 },
+                { "type": "high", "time": "16:25", "height": 2.97 }
+            ]
+        };
+        // =========================================
+
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -118,12 +486,6 @@
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
         const loadingSpinner = document.getElementById('loadingSpinner'); 
-
-        const API_BASE_URL = '/api/tide'; 
-        
-        // CORREÇÃO ALTURA: Offset para converter MSL (padrão Stormglass) para LAT (tabelas náuticas).
-        // Baseado na diferença aproximada para Natal/RN (aprox. 1.40 metros).
-        const TIDE_OFFSET = 1.40; 
 
         // Funções de Utilidade
         function getTodayDate() {
@@ -155,36 +517,26 @@
             showLoading(false); 
         }
         
-        // CORREÇÃO FUSO HORÁRIO: Função para formatar o tempo para o fuso horário de Natal/RN (America/Fortaleza = GMT -3)
-        const formatTime = (isoTime) => {
-            try {
-                const date = new Date(isoTime); 
-                
-                const options = { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    hour12: false,
-                    timeZone: 'America/Fortaleza' // Fuso horário de Natal/RN
-                };
-                
-                return date.toLocaleTimeString('pt-BR', options);
-            } catch (e) {
-                return 'N/A';
+        // A hora já está no fuso correto (GMT -3) no JSON, apenas formatamos a string.
+        const formatTime = (timeString) => {
+            // O tempo já vem no formato HH:MM (ex: "00:40")
+            if (timeString && timeString.length === 5) {
+                return timeString; 
             }
+            return 'N/A';
         };
 
-        // Função para exibir os dados na lista - Adaptada para Stormglass + Offset
-        const displayTideData = (stormglassEvents) => {
+        // Função para exibir os dados na lista - Adaptada para JSON Local
+        const displayTideData = (tideEvents) => {
             
             let resultsHtml = `
-                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Eventos de Maré</h2>
+                <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-2 text-title-color">Natal/RN - Tábua Oficial</h2>
             `; 
 
             resultsHtml += `<div class="w-full mt-4 space-y-3">`;
 
-            // stormglassEvents é o array 'data'
-            stormglassEvents.forEach(event => {
-                // Stormglass usa 'high' ou 'low'
+            tideEvents.forEach(event => {
+                // O JSON local usa "high" e "low"
                 const isHighTide = event.type === 'high'; 
                 const icon = isHighTide ? '▲' : '▼';
                 
@@ -192,18 +544,17 @@
                 const color = isHighTide ? 'text-tide-high' : 'text-tide-low';
                 const borderColor = isHighTide ? 'border-tide-high/50' : 'border-tide-low/50';
                 const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
+                
+                // A altura já é a final e correta (em metros)
+                const height = event.height.toFixed(2); 
 
-                // Aplica o offset para converter a altura (MSL) para a altura (LAT)
-                const correctedHeight = event.height + TIDE_OFFSET; 
-
-                // Stormglass retorna 'height' e 'time'
                 resultsHtml += `
                     <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${borderColor}">
                         <div class="flex items-center space-x-3">
                             <span class="text-xl font-bold ${color}">${icon}</span>
                             <div>
                                 <p class="font-medium text-gray-900">${label}</p>
-                                <p class="text-xs text-gray-500">Altura: ${correctedHeight.toFixed(2)}m</p>
+                                <p class="text-xs text-gray-500">Altura: ${height}m</p>
                             </div>
                         </div>
                         <span class="text-lg font-bold text-gray-700">${formatTime(event.time)}</span>
@@ -225,42 +576,26 @@
 
         // Lógica da Consulta
         async function fetchTideData(dateString) {
-            const url = `${API_BASE_URL}?date=${dateString}`; 
-
             showLoading(true);
             message.textContent = 'Buscando dados...';
             message.classList.remove('hidden'); 
+
             // Estilo de busca
             resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-card-bg', 'border-gray-300');
 
             try {
-                const response = await fetch(url);
-                const data = await response.json(); 
-
-                if (!response.ok) {
-                    let errorMessage = 'Ocorreu um erro desconhecido na comunicação.';
-                    if (response.status === 429) {
-                        errorMessage = 'ERRO STORMGLASS (429): Limite de Requisições (Rate Limit) Atingido. Tente novamente mais tarde.';
-                    } else if (response.status === 403) {
-                         errorMessage = 'ERRO STORMGLASS (403): Chave Inválida ou Plano sem Acesso a Marés. Verifique a Variável de Ambiente.';
-                    } else if (data.error) {
-                        // Erro vindo do nosso Serverless Function
-                        errorMessage = `Erro do Servidor (${response.status}): ${data.error}. Detalhes: ${data.details}`;
-                    } else {
-                        errorMessage = `Erro de Conexão: Status HTTP ${response.status}.`;
-                    }
-                    
-                    showError(errorMessage);
-                    return;
-                }
+                // Simula uma busca assíncrona (opcional, apenas para dar a sensação de loading)
+                await new Promise(resolve => setTimeout(resolve, 300)); 
                 
-                const tideEvents = data.data; 
+                // Busca o array de eventos de maré pela chave da data (YYYY-MM-DD)
+                const tideEvents = TIDE_DATA_2025[dateString]; 
 
                 if (tideEvents && tideEvents.length > 0) {
                     displayTideData(tideEvents);
                 } else {
-                    message.textContent = 'Nenhum evento de maré (Alta/Baixa) encontrado para esta data ou local.';
+                    // Se não houver dados para a data selecionada
+                    message.textContent = 'Sem dados de tábua para esta data.';
                     message.classList.remove('hidden');
                     tideList.classList.add('hidden');
                     // Estilo de aviso
@@ -269,8 +604,8 @@
                 }
 
             } catch (error) {
-                console.error('Erro de rede ou Serverless Function:', error);
-                showError(`Erro de Comunicação: Verifique a sua conexão ou os logs do Vercel. Detalhe: ${error.message}`);
+                console.error('Erro na busca de dados locais:', error);
+                showError('Erro interno ao ler a tábua de marés.');
             } finally {
                 showLoading(false);
             }
