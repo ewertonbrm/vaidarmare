@@ -1,22 +1,15 @@
 // A versão do cache é CRÍTICA. Mude este número sempre que alterar qualquer arquivo estático (HTML, CSS, JS, Imagens, JSON de dados).
-const CACHE_NAME = 'vaidarmare-v1.0.3'; 
+const CACHE_NAME = 'vaidarmare-v1.0.4'; 
 
 // Lista de URLs para cachear no momento da instalação (App Shell)
-// Agora inclui o JSON de dados e ícones que o PWA precisa.
 const urlsToCache = [
-    '/', // Representa index.html
+    '/', // Representa index.html na raiz
     'index.html',
     'manifest.json',
-    // O service-worker se registra, mas não se cacheia
     
-    // ATIVOS
-    // Assumindo que você tem os ícones necessários no root:
-    'icon-192x192.png', // Exemplo de ícone, ajuste se os nomes forem diferentes
-    'icon-512x512.png', // Exemplo de ícone, ajuste se os nomes forem diferentes
-    
-    // FONTE: Oswald e Playwrite são carregadas via CDN, mas mantemos o index.html na lista.
-    
-    // DADOS: Agora os dados estão embutidos no index.html, então não precisamos cachear um arquivo de dados externo!
+    // Lista de ativos (Ajuste os nomes dos seus ícones se necessário)
+    'icon-192x192.png', 
+    'icon-512x512.png', 
 ];
 
 // --- Etapa 1: Instalação e Cache do App Shell ---
@@ -59,7 +52,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     
-    // Ignora requisições de outras origens (como Google Fonts CDN)
+    // Ignora requisições de outras origens (CDNs de fonte, Tailwind)
     if (url.origin !== location.origin) {
         return;
     }
@@ -74,8 +67,8 @@ self.addEventListener('fetch', (event) => {
             
             // Caso contrário, busca na rede
             return fetch(event.request).catch(() => {
-                // Opcional: Aqui você pode retornar uma página offline customizada
-                console.error('Falha na busca e cache:', event.request.url);
+                // Se tudo falhar, podemos retornar o index.html em cache como fallback
+                return caches.match('index.html'); 
             });
         })
     );
