@@ -86,13 +86,13 @@
 
         <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-card-bg border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
 
-            <p id="message" class="text-gray-500 text-center">Selecione a data para consultar a tábua.</p>
+            <p id="message" class="text-gray-500 text-center">Insira a data para consultar a tábua.</p>
             <div id="tideList" class="w-full mt-4 space-y-3 hidden">
                 </div>
         </div>
         
         <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Stormglass API. Integração via Vercel Serverless Function.</p>
-        
+        <p class="mt-1 text-xs text-center text-gray-500 font-bold">Horários exibidos em GMT -3 (Hora de Natal/RN).</p>
     </div>
 
     <script>
@@ -120,6 +120,10 @@
         const loadingSpinner = document.getElementById('loadingSpinner'); 
 
         const API_BASE_URL = '/api/tide'; 
+        
+        // CORREÇÃO ALTURA: Offset para converter MSL (padrão Stormglass) para LAT (tabelas náuticas).
+        // Baseado na diferença aproximada para Natal/RN (aprox. 1.40 metros).
+        const TIDE_OFFSET = 1.40; 
 
         // Funções de Utilidade
         function getTodayDate() {
@@ -151,7 +155,7 @@
             showLoading(false); 
         }
         
-        // CORREÇÃO: Função para formatar o tempo para o fuso horário de Natal/RN (America/Fortaleza = GMT -3)
+        // CORREÇÃO FUSO HORÁRIO: Função para formatar o tempo para o fuso horário de Natal/RN (America/Fortaleza = GMT -3)
         const formatTime = (isoTime) => {
             try {
                 const date = new Date(isoTime); 
@@ -169,7 +173,7 @@
             }
         };
 
-        // Função para exibir os dados na lista - Adaptada para Stormglass
+        // Função para exibir os dados na lista - Adaptada para Stormglass + Offset
         const displayTideData = (stormglassEvents) => {
             
             let resultsHtml = `
@@ -189,6 +193,9 @@
                 const borderColor = isHighTide ? 'border-tide-high/50' : 'border-tide-low/50';
                 const label = isHighTide ? 'Maré Alta' : 'Maré Baixa';
 
+                // Aplica o offset para converter a altura (MSL) para a altura (LAT)
+                const correctedHeight = event.height + TIDE_OFFSET; 
+
                 // Stormglass retorna 'height' e 'time'
                 resultsHtml += `
                     <div class="flex justify-between items-center p-3 rounded-lg bg-white border shadow-sm ${borderColor}">
@@ -196,7 +203,7 @@
                             <span class="text-xl font-bold ${color}">${icon}</span>
                             <div>
                                 <p class="font-medium text-gray-900">${label}</p>
-                                <p class="text-xs text-gray-500">Altura: ${event.height.toFixed(2)}m</p>
+                                <p class="text-xs text-gray-500">Altura: ${correctedHeight.toFixed(2)}m</p>
                             </div>
                         </div>
                         <span class="text-lg font-bold text-gray-700">${formatTime(event.time)}</span>
