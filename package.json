@@ -1,9 +1,0 @@
-{
-  "name": "stormglass-tide-app",
-  "version": "1.0.0",
-  "description": "Proxy for **Stormglass** Tide API using Vercel Serverless Function.",
-  "main": "api/tide.js",
-  "scripts": {
-    "start": "node api/tide.js"
-  }
-}
