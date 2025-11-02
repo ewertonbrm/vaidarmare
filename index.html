@@ -92,7 +92,6 @@
         </div>
         
         <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Marinha do Brasil (DHN).</p>
-        
     </div>
 
     <script>
@@ -277,7 +276,7 @@
                 { "type": "high", "time": "12:36", "height": 2.01 },
                 { "type": "low", "time": "18:32", "height": 0.61 }
             ],
-            // === DEZEMBRO 2025 (Valores da revisão anterior - Sem alterações) ===
+            // === DEZEMBRO 2025 (Valores da revisão anterior) ===
             "2025-12-01": [
                 { "type": "high", "time": "00:59", "height": 2.12 },
                 { "type": "low", "time": "06:57", "height": 0.43 },
@@ -491,8 +490,12 @@
 
         // Funções de Utilidade
         function getTodayDate() {
-            // Define a data de inicialização como o primeiro dia disponível no JSON (2025-11-01)
-            return '2025-11-01'; 
+            // CORRIGIDO: Captura a data vigente do dispositivo no formato YYYY-MM-DD
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
         }
         
         function showLoading(show) {
