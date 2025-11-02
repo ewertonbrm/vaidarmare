@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Parâmetros Ausentes.', details: 'Data (date) é obrigatória.' });
     }
     
-    // CORREÇÃO CRÍTICA: Definir start/end no formato ISO 8601 (com tempo e UTC 'Z') para 24h completas.
+    // CORREÇÃO DE FORMATO: Definir start/end no formato ISO 8601 (com tempo e UTC 'Z') para 24h completas.
     const startDateISO = `${date}T00:00:00Z`; 
     const endDateISO = `${date}T23:59:59Z`; 
 
@@ -42,6 +42,10 @@ export default async function handler(req, res) {
     finalUrl.searchParams.append('lng', NATAL_LNG);
     finalUrl.searchParams.append('start', startDateISO); 
     finalUrl.searchParams.append('end', endDateISO);
+    
+    // CORREÇÃO DE PARÂMETRO CRÍTICO: Mudar a base de referência (datum) de MSL para LAT (Lowest Astronomical Tide)
+    // Isso garante que as alturas de maré sejam positivas, como nas tabelas de navegação.
+    finalUrl.searchParams.append('datum', 'LAT');
 
     console.log(`DEBUG: Chamando API Stormglass: ${finalUrl.toString()}`);
 
