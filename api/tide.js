@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Parâmetros Ausentes.', details: 'Data (date) é obrigatória.' });
     }
     
-    // CORREÇÃO DE FORMATO: Definir start/end no formato ISO 8601 (com tempo e UTC 'Z') para 24h completas.
+    // Definir start/end no formato ISO 8601 (com tempo e UTC 'Z') para 24h completas.
     const startDateISO = `${date}T00:00:00Z`; 
     const endDateISO = `${date}T23:59:59Z`; 
 
@@ -43,9 +43,8 @@ export default async function handler(req, res) {
     finalUrl.searchParams.append('start', startDateISO); 
     finalUrl.searchParams.append('end', endDateISO);
     
-    // CORREÇÃO DE PARÂMETRO CRÍTICO: Mudar a base de referência (datum) de MSL para LAT (Lowest Astronomical Tide)
-    // Isso garante que as alturas de maré sejam positivas, como nas tabelas de navegação.
-    finalUrl.searchParams.append('datum', 'LAT');
+    // CRÍTICO: O parâmetro 'datum=LAT' foi removido para evitar o erro 422 
+    // e o cálculo do offset será feito no frontend.
 
     console.log(`DEBUG: Chamando API Stormglass: ${finalUrl.toString()}`);
 
@@ -57,6 +56,7 @@ export default async function handler(req, res) {
         });
         
         if (!apiResponse.ok) {
+            // Se o erro 422 persistir, o problema é outro parâmetro.
             const errorBody = await apiResponse.json(); 
             
             console.error(`ERRO NA CHAMADA STORMGLASS (STATUS: ${apiResponse.status})`);
@@ -67,6 +67,8 @@ export default async function handler(req, res) {
                 errorMessage = 'ERRO STORMGLASS (429): Limite de Requisições (Rate Limit) Atingido.';
             } else if (apiResponse.status === 403) {
                  errorMessage = 'ERRO STORMGLASS (403): Chave Inválida ou Plano sem Acesso a Marés.';
+            } else if (apiResponse.status === 422) {
+                 errorMessage = 'ERRO STORMGLASS (422): Erro de Parâmetro Inválido (Ex: data fora do range de previsão).';
             }
 
             return res.status(apiResponse.status).json({ 
