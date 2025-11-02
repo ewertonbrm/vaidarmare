@@ -136,7 +136,7 @@
                 { "type": "high", "time": "05:27", "height": 1.57 },
                 { "type": "low", "time": "11:21", "height": 0.85 },
                 { "type": "high", "time": "17:35", "height": 1.53 },
-                { "type": "low": "23:53", "height": 0.85 }
+                { "type": "low", "time": "23:53", "height": 0.85 }
             ],
             "2025-11-07": [
                 { "type": "low", "time": "12:35", "height": 0.84 },
@@ -467,6 +467,9 @@
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // NOTE: Se você estava usando o arquivo service-worker.js antigo, lembre-se de atualizá-lo 
+                // para remover a regra de exclusão do cache para /api/tide, se ainda não o fez, 
+                // ou apenas deixar a versão atual.
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
                         console.log('SW registrado com sucesso. Escopo:', registration.scope);
@@ -612,11 +615,25 @@
         }
 
 
-        // Listener do Formulário
+        // Listener do Formulário (CORRIGIDO PARA O FORMATO DE DATA YYYY-MM-DD)
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const dateString = dateInput.value;
             
+            let dateString = dateInput.value;
+            
+            // --- VERIFICAÇÃO DE FORMATO CRÍTICA ---
+            // Garante que a string tenha o formato YYYY-MM-DD e é válida.
+            if (!dateString || !/\d{4}-\d{2}-\d{2}/.test(dateString)) {
+                showError("Formato de data inválido. Por favor, selecione uma data no calendário.");
+                return;
+            }
+            
+            // Adiciona uma verificação de ano, já que os dados são apenas para 2025
+            if (!dateString.startsWith('2025')) {
+                showError("A tábua de marés está disponível apenas para Novembro e Dezembro de 2025.");
+                return;
+            }
+
             if (dateString) {
                 fetchTideData(dateString); 
             }
