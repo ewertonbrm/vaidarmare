@@ -277,7 +277,7 @@
                 { "type": "high", "time": "12:36", "height": 2.01 },
                 { "type": "low", "time": "18:32", "height": 0.61 }
             ],
-            // === DEZEMBRO 2025 (Valores da revisão anterior) ===
+            // === DEZEMBRO 2025 (Valores da revisão anterior - Sem alterações) ===
             "2025-12-01": [
                 { "type": "high", "time": "00:59", "height": 2.12 },
                 { "type": "low", "time": "06:57", "height": 0.43 },
@@ -468,12 +468,13 @@
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
+                // Registro do Service Worker com escopo definido para raiz da aplicação
+                navigator.serviceWorker.register('/service-worker.js', {scope: '/'}) 
                     .then(registration => {
-                        console.log('SW registrado com sucesso. Escopo:', registration.scope);
+                        console.log('Service Worker registrado com sucesso:', registration.scope);
                     })
                     .catch(error => {
-                        console.error('Falha no registro do SW:', error);
+                        console.log('Falha no registro do Service Worker:', error);
                     });
             });
         }
