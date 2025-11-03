@@ -467,7 +467,7 @@
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // CORREÇÃO CRÍTICA: Escopo ajustado para '/vaidarmare/'
+                // CORREÇÃO CRÍTICA: Escopo ajustado para '/vaidarmare/' para controlar o subdiretório
                 navigator.serviceWorker.register('/service-worker.js', {scope: '/vaidarmare/'}) 
                     .then(registration => {
                         console.log('Service Worker registrado com sucesso:', registration.scope);
@@ -490,7 +490,7 @@
 
         // Funções de Utilidade
         function getTodayDate() {
-            // CORRIGIDO: Captura a data vigente do dispositivo no formato YYYY-MM-DD
+            // Captura a data vigente do dispositivo no formato YYYY-MM-DD
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
