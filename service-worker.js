@@ -1,5 +1,6 @@
 const CACHE_NAME = 'vaidarmare-pwa-cache-v5';
-// CAMINHOS AJUSTADOS
+// CAMINHOS AJUSTADOS - IMPORTANTE: O Service Worker precisa do caminho completo
+// Se sua PWA está em um subdiretório (ex: /vaidarmare/), os caminhos devem refletir isso.
 const urlsToCache = [
     '/vaidarmare/',
     '/vaidarmare/index.html',
@@ -7,7 +8,7 @@ const urlsToCache = [
     '/vaidarmare/icon-192x192.png',
     '/vaidarmare/icon-512x512.png'
     // Adicione o caminho do seu GIF aqui se estiver local
-    // '/insta/caminho/do/seu/gif.gif' 
+    // '/vaidarmare/caminho/do/seu/gif.gif' 
 ];
 
 self.addEventListener('install', event => {
@@ -21,18 +22,16 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Ignora requisições para o site externo (https://androidauthority.com)
-  if (!event.request.url.includes(self.location.origin)) {
-      return;
-  }
-  
+  // Estratégia Cache-First para ativos cacheados (Obrigatório para Service Worker básico)
+  // **A lógica de fetch não está mais ignorando domínios externos específicos.**
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         if (response) {
-          return response;
+          return response; // Retorna do cache se encontrado
         }
-        return fetch(event.request);
+        // Tenta buscar da rede se não estiver no cache
+        return fetch(event.request); 
       })
   );
 });
@@ -44,11 +43,11 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            // Deleta caches antigos
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
-
 });
