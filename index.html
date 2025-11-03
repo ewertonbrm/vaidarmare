@@ -467,8 +467,8 @@
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Registro do Service Worker com escopo definido para raiz da aplicação
-                navigator.serviceWorker.register('/service-worker.js', {scope: '/'}) 
+                // CORREÇÃO CRÍTICA: Escopo ajustado para '/vaidarmare/'
+                navigator.serviceWorker.register('/service-worker.js', {scope: '/vaidarmare/'}) 
                     .then(registration => {
                         console.log('Service Worker registrado com sucesso:', registration.scope);
                     })
