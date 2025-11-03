@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vai Dar Maré!</title>
+    
     <link rel="manifest" href="/vaidarmare/manifest.json">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,7 +65,7 @@
         
         <form id="tideForm" class="space-y-4">
             
-            <p class="text-sm font-medium text-gray-700 text-center py-2">
+            <p class="text-sm font-medium text-gray-700 text-center pt-2 pb-2 mt-0">
                 Tábua das Marés de Natal/RN.
             </p>
 
@@ -172,27 +173,27 @@
                 { "type": "high", "time": "23:02", "height": 1.91 }
             ],
             "2025-11-13": [
-                { "type": "low", "time": "05:25", "height": 0.66 },
-                { "type": "high", "time": "11:49", "height": 1.84 },
-                { "type": "low", "time": "17:49", "height": 0.83 }
+                { "type": "low", "time": "05:29", "height": 0.75 },
+                { "type": "high", "time": "11:49", "height": 1.87 },
+                { "type": "low", "time": "17:59", "height": 0.84 }
             ],
             "2025-11-14": [
                 { "type": "high", "time": "00:10", "height": 1.96 },
                 { "type": "low", "time": "06:25", "height": 0.65 },
-                { "type": "high", "time": "12:46", "height": 1.92 },
-                { "type": "low", "time": "18:49", "height": 0.75 }
+                { "type": "high", "time": "12:47", "height": 1.91 },
+                { "type": "low", "time": "18:57", "height": 0.78 }
             ],
             "2025-11-15": [
                 { "type": "high", "time": "01:04", "height": 2.02 },
                 { "type": "low", "time": "07:12", "height": 0.6 },
                 { "type": "high", "time": "13:34", "height": 2.01 },
-                { "type": "low", "time": "19:34", "height": 0.66 }
+                { "type": "low", "time": "19:47", "height": 0.70 }
             ],
             "2025-11-16": [
                 { "type": "high", "time": "01:53", "height": 2.07 },
                 { "type": "low", "time": "07:51", "height": 0.54 },
-                { "type": "high", "time": "14:14", "height": 2.09 },
-                { "type": "low", "time": "20:12", "height": 0.56 }
+                { "type": "high", "time": "14:23", "height": 2.03 },
+                { "type": "low", "time": "20:29", "height": 0.59 }
             ],
             "2025-11-17": [
                 { "type": "high", "time": "02:36", "height": 2.11 },
@@ -465,8 +466,7 @@
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // CORREÇÃO 2: Ajustado o caminho de registro do Service Worker para ser /vaidarmare/service-worker.js
-                // O escopo está correto para o subdiretório /vaidarmare/
+                // CORREÇÃO PWA: Caminho de registro ajustado para o subdiretório
                 navigator.serviceWorker.register('/vaidarmare/service-worker.js', {scope: '/vaidarmare/'}) 
                     .then(registration => {
                         console.log('Service Worker registrado com sucesso:', registration.scope);
