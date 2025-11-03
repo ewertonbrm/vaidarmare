@@ -1,11 +1,11 @@
-const CACHE_NAME = 'vaidarmare-pwa-cache-v5';
+const CACHE_NAME = 'vaidarmare-pwa-cache-v9';
 // URLs ajustadas para RELATIVAS à pasta /vaidarmare/
 const urlsToCache = [
-    './', // Representa index.html quando a start_url é resolvida para o diretório
-    './index.html',
-    './manifest.json',
-    './icon-192x192.png',
-    './icon-512x512.png'
+    '/vaidarmare/', // Representa index.html quando a start_url é resolvida para o diretório
+    '/vaidarmare/index.html',
+    '/vaidarmare/manifest.json',
+    '/vaidarmare/icon-192x192.png',
+    '/vaidarmare/icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -19,14 +19,18 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Estratégia Cache-First para ativos cacheados
+  // Ignora requisições para o site externo (https://androidauthority.com)
+  if (!event.request.url.includes(self.location.origin)) {
+      return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         if (response) {
-          return response; 
+          return response;
         }
-        return fetch(event.request); 
+        return fetch(event.request);
       })
   );
 });
@@ -38,11 +42,12 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
-            // Deleta caches antigos
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
+
 });
+
