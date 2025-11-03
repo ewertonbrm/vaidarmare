@@ -1,5 +1,5 @@
 const CACHE_NAME = 'vaidarmare-pwa-cache-v9';
-// URLs ajustadas para RELATIVAS à pasta /vaidarmare/
+// URLs ajustadas para o subdiretório /vaidarmare/ para consistência
 const urlsToCache = [
     '/vaidarmare/', // Representa index.html quando a start_url é resolvida para o diretório
     '/vaidarmare/index.html',
@@ -50,4 +50,3 @@ self.addEventListener('activate', event => {
   );
 
 });
-
