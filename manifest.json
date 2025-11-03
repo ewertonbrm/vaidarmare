@@ -2,21 +2,21 @@
     "name": "Vai Dar Maré",
     "short_name": "Vai Dar Maré",
     "description": "Tábua das marés de Natal/RN.",
-    "start_url": "./index.html",
-    "scope": "./",
+    "start_url": "/vaidarmare/index.html",
     "display": "standalone",
     "background_color": "#001F4F",
     "theme_color": "#001F4F",
     "icons": [
         {
-            "src": "icon-192x192.png",
+            "src": "/vaidarmare/icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "icon-512x512.png",
+            "src": "/vaidarmare/icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
     ]
 }
+
