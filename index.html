@@ -50,14 +50,14 @@
         }
     </script>
 </head>
-<body class="min-h-screen flex items-start justify-center pt-8 pb-4 px-4">
+<body class="min-h-screen flex items-start justify-center pt-16 pb-8 px-4">
 
     <div class="w-full max-w-lg card rounded-xl p-6 md:p-8">
         
-        <div class="flex flex-col items-center mt-4 mb-4">
-            <img src="icon-192x192.png" class="w-32 md:w-40" alt="Logo Vai Dar Maré: Símbolo de ondas em tons de azul">
+        <div class="flex flex-col items-center mt-0 mb-6">
+            <img src="icon-192x192.png" class="w-24 md:w-32" alt="Logo Vai Dar Maré: Símbolo de ondas em tons de azul">
 
-            <h2 class="cursive-title text-4xl font-extrabold text-title-color mt-2">
+            <h2 class="cursive-title text-3xl font-extrabold text-title-color mt-2">
                 Vai Dar Maré
             </h2>
         </div>
@@ -83,15 +83,15 @@
                 </svg>
             </button>
         </form>
-
-        <div id="resultsContainer" class="mt-6 pt-4 pb-6 px-4 rounded-xl bg-card-bg border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
+        
+        <div id="resultsContainer" class="mt-6 pt-2 pb-2 px-4 rounded-xl bg-card-bg border border-gray-200 min-h-[100px] flex flex-col items-center justify-center transition-all duration-300">
 
             <p id="message" class="text-gray-500 text-center">Selecione a data para consultar a tábua.</p>
-            <div id="tideList" class="w-full mt-4 space-y-3 hidden">
+            <div id="tideList" class="w-full space-y-3 hidden">
                 </div>
         </div>
         
-        <p class="mt-6 text-xs text-center text-gray-400">Dados fornecidos pela Marinha do Brasil (DHN). Ponto de referência: Porto de Natal/RN.</p>
+        <p class="mt-8 text-xs text-center text-gray-400">Dados fornecidos pela Marinha do Brasil (DHN). Ponto de referência: Porto de Natal/RN.</p>
     </div>
 
     <script>
@@ -467,7 +467,7 @@
         // === REGISTRO DO SERVICE WORKER (PWA) ===
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // CORREÇÃO CRÍTICA: Escopo ajustado para '/vaidarmare/' para controlar o subdiretório
+                // Escopo ajustado para '/vaidarmare/' para controlar o subdiretório
                 navigator.serviceWorker.register('/service-worker.js', {scope: '/vaidarmare/'}) 
                     .then(registration => {
                         console.log('Service Worker registrado com sucesso:', registration.scope);
@@ -512,6 +512,7 @@
         function showError(msg) {
             message.textContent = msg;
             message.classList.remove('hidden'); 
+            
             // Estilo de erro
             resultsContainer.classList.remove('bg-card-bg', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-red-100', 'border-red-400');
@@ -526,7 +527,7 @@
             return 'N/A';
         };
 
-        // Função para exibir os dados na lista - Adaptada para JSON Local e ORDENADA
+        // Função para exibir os dados na lista - Ajustada para harmonia
         const displayTideData = (tideEvents) => {
             
             // CRÍTICO: Ordena os eventos pela hora (time)
@@ -540,7 +541,8 @@
                 
             `; 
 
-            resultsHtml += `<div class="w-full mt-4 space-y-3">`;
+            // Removido o mt-4 de tideList, mas mantendo o espaçamento entre os cards
+            resultsHtml += `<div class="w-full space-y-3">`;
 
             tideEvents.forEach(event => {
                 const isHighTide = event.type === 'high'; 
@@ -572,9 +574,10 @@
             message.textContent = '';
             message.classList.add('hidden');
             tideList.classList.remove('hidden');
-            // Estilo de sucesso
-            resultsContainer.classList.remove('bg-card-bg', 'bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400');
-            resultsContainer.classList.add('bg-tide-high/20', 'border-tide-high/50');
+            
+            // Estilo de sucesso (Harmonizado: usa cor de fundo neutra, mantém borda sutil)
+            resultsContainer.classList.remove('bg-red-100', 'bg-yellow-100', 'border-red-400', 'border-yellow-400', 'bg-tide-high/20');
+            resultsContainer.classList.add('bg-card-bg', 'border-tide-high/50');
         };
 
 
@@ -584,7 +587,7 @@
             message.textContent = 'Buscando dados...';
             message.classList.remove('hidden'); 
 
-            // Estilo de busca
+            // Estilo de busca (Cor de fundo neutra)
             resultsContainer.classList.remove('bg-red-100', 'border-red-400', 'bg-tide-high/20', 'border-tide-high/50', 'bg-yellow-100', 'border-yellow-400');
             resultsContainer.classList.add('bg-card-bg', 'border-gray-300');
 
