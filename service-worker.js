@@ -1,14 +1,11 @@
 const CACHE_NAME = 'vaidarmare-pwa-cache-v5';
-// CAMINHOS AJUSTADOS - IMPORTANTE: O Service Worker precisa do caminho completo
-// Se sua PWA está em um subdiretório (ex: /vaidarmare/), os caminhos devem refletir isso.
+// URLs ajustadas para RELATIVAS à pasta /vaidarmare/
 const urlsToCache = [
-    '/vaidarmare/',
-    '/vaidarmare/index.html',
-    '/vaidarmare/manifest.json',
-    '/vaidarmare/icon-192x192.png',
-    '/vaidarmare/icon-512x512.png'
-    // Adicione o caminho do seu GIF aqui se estiver local
-    // '/vaidarmare/caminho/do/seu/gif.gif' 
+    './', // Representa index.html quando a start_url é resolvida para o diretório
+    './index.html',
+    './manifest.json',
+    './icon-192x192.png',
+    './icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -22,15 +19,13 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Estratégia Cache-First para ativos cacheados (Obrigatório para Service Worker básico)
-  // **A lógica de fetch não está mais ignorando domínios externos específicos.**
+  // Estratégia Cache-First para ativos cacheados
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         if (response) {
-          return response; // Retorna do cache se encontrado
+          return response; 
         }
-        // Tenta buscar da rede se não estiver no cache
         return fetch(event.request); 
       })
   );
